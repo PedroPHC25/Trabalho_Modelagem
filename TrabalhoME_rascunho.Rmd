@@ -1,0 +1,461 @@
+---
+title: "TrabalhoME"
+author: "Pedro Henrique Coterli"
+date: "`r format(Sys.Date(), '%d de %B de %Y')`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+$$
+\alpha = \beta
+$$
+
+## R Markdown
+
+```{r, echo=FALSE}
+if(!require(AER)) install.packages("AER")
+library(dplyr)
+library(ggplot2)
+library(AER)
+data("RecreationDemand")
+head(RecreationDemand)
+```
+
+# Trips
+
+```{r, echo=FALSE}
+hist(RecreationDemand$trips, breaks = 100)
+```
+
+```{r}
+print(paste("Mean:", mean(RecreationDemand$trips)))
+print(paste("Var:", var(RecreationDemand$trips)))
+```
+
+# Quality: NÃO (dados desconhecidos e parece não influenciar)
+
+```{r}
+barplot(table(RecreationDemand$quality))
+```
+
+```{r}
+plot(jitter(RecreationDemand$quality), RecreationDemand$trips)
+```
+
+```{r}
+plot(tapply(RecreationDemand$trips, RecreationDemand$quality, mean))
+```
+
+# Ski: SIM
+
+```{r}
+barplot(table(RecreationDemand$ski))
+```
+
+```{r}
+plot(jitter(ifelse(RecreationDemand$ski == "yes", 1, 0)), RecreationDemand$trips)
+```
+
+```{r}
+barplot(tapply(RecreationDemand$trips, RecreationDemand$ski, mean))
+```
+
+# Income: SIM
+
+```{r}
+barplot(table(RecreationDemand$income))
+```
+
+```{r}
+plot(jitter(RecreationDemand$income), RecreationDemand$trips)
+```
+
+```{r}
+barplot(tapply(RecreationDemand$trips, RecreationDemand$income, mean))
+```
+
+# User fee: NÃO (dados desbalanceados)
+
+```{r}
+barplot(table(RecreationDemand$userfee))
+```
+
+```{r}
+plot(jitter(ifelse(RecreationDemand$userfee == "yes", 1, 0)), RecreationDemand$trips)
+```
+
+```{r}
+barplot(tapply(RecreationDemand$trips, RecreationDemand$userfee, mean))
+```
+
+# CostC: SIM
+
+```{r}
+hist(RecreationDemand$costC, breaks = 50)
+```
+
+```{r, echo = FALSE}
+ggplot(RecreationDemand, aes(x = costC, y = trips)) +
+  stat_summary_bin(fun = mean, bins = 50, geom = "point")
+```
+
+# CostS: NÃO (colinear com CostC)
+
+```{r}
+hist(RecreationDemand$costS, breaks = 50)
+```
+
+```{r, echo = FALSE}
+ggplot(RecreationDemand, aes(x = costS, y = trips)) +
+  stat_summary_bin(fun = mean, bins = 50, geom = "point")
+```
+
+```{r}
+plot(RecreationDemand$costC, RecreationDemand$costS)
+```
+
+```{r}
+model = glm(costS ~ costC, data = RecreationDemand)
+summary(model)
+
+# Calcular o R² (usando o R2 baseado na deviance)
+r2 <- 1 - (model$deviance / model$null.deviance)
+
+# Número de observações e número de preditores
+n <- nrow(RecreationDemand)   # número de observações
+p <- length(coef(model)) - 1 # número de preditores (excluindo o intercepto)
+
+# Calcular o R² ajustado
+r2_ajustado <- 1 - ((1 - r2) * (n - 1) / (n - p - 1))
+
+# Exibir os resultados
+cat("R²:", r2, "\n")
+cat("R² ajustado:", r2_ajustado, "\n")
+```
+
+# CostH: NÃO (colinear com CostC e CostS)
+
+```{r}
+hist(RecreationDemand$costH, breaks = 50)
+```
+
+```{r, echo = FALSE}
+ggplot(RecreationDemand, aes(x = costH, y = trips)) +
+  stat_summary_bin(fun = mean, bins = 50, geom = "point")
+```
+
+```{r}
+plot(RecreationDemand$costH, RecreationDemand$costC)
+```
+
+```{r}
+plot(RecreationDemand$costH, RecreationDemand$costS)
+```
+
+```{r}
+model = glm(costH ~ costC, data = RecreationDemand)
+summary(model)
+
+# Calcular o R² (usando o R2 baseado na deviance)
+r2 <- 1 - (model$deviance / model$null.deviance)
+
+# Número de observações e número de preditores
+n <- nrow(RecreationDemand)   # número de observações
+p <- length(coef(model)) - 1 # número de preditores (excluindo o intercepto)
+
+# Calcular o R² ajustado
+r2_ajustado <- 1 - ((1 - r2) * (n - 1) / (n - p - 1))
+
+# Exibir os resultados
+cat("R²:", r2, "\n")
+cat("R² ajustado:", r2_ajustado, "\n")
+```
+
+```{r}
+model = glm(costH ~ costS, data = RecreationDemand)
+summary(model)
+
+# Calcular o R² (usando o R2 baseado na deviance)
+r2 <- 1 - (model$deviance / model$null.deviance)
+
+# Número de observações e número de preditores
+n <- nrow(RecreationDemand)   # número de observações
+p <- length(coef(model)) - 1 # número de preditores (excluindo o intercepto)
+
+# Calcular o R² ajustado
+r2_ajustado <- 1 - ((1 - r2) * (n - 1) / (n - p - 1))
+
+# Exibir os resultados
+cat("R²:", r2, "\n")
+cat("R² ajustado:", r2_ajustado, "\n")
+```
+
+# SIM: ski, income e costS
+
+# Ajustando o modelo
+
+```{r}
+RecreationDemand$ski_num = ifelse(RecreationDemand$ski == "yes", 1, 0)
+RecreationDemand$costS_100 = RecreationDemand$costS / 100
+```
+
+```{r}
+model = glm(trips ~ ski + income + quality + costS_100, data = RecreationDemand, family = poisson())
+summary(model)
+```
+
+# Avaliando
+
+## Estatística qui-quadrado de Pearson (X\^2): NÃO FUNCIONA!
+
+```{r}
+trips_pred = predict(model, type = "response")
+
+chi2_pearson = sum(((RecreationDemand$trips - trips_pred)^2)/trips_pred)
+
+df = model$df.residual
+
+pvalue = pchisq(chi2_pearson, df, lower.tail = FALSE)
+
+cat("p-valor:", pvalue)
+```
+
+O modelo não se ajusta bem aos dados.
+
+# Estatística qui-quadrado de razão de verossimilhança (C)
+
+```{r}
+min_model = glm(trips ~ 1, data = RecreationDemand, family = poisson())
+summary(min_model)
+```
+
+```{r}
+min_trips_pred = predict(min_model, type = "response")
+
+min_log_likelihood = sum(-min_trips_pred + RecreationDemand$trips * log(min_trips_pred) - log(factorial(RecreationDemand$trips)))
+
+model_log_likelihood = sum(-trips_pred + RecreationDemand$trips * log(trips_pred) - log(factorial(RecreationDemand$trips)))
+
+C = 2*(min_log_likelihood + 4 - min_log_likelihood)
+
+cat("C:", C, "\n")
+
+df = model$df.null - model$df.residual
+
+pvalue = pchisq(C, df, lower.tail = FALSE)
+
+cat("p-valor:", pvalue)
+```
+
+```{r}
+C = model$null.deviance - model$deviance
+
+cat("C:", C, "\n")
+```
+
+As covariáveis têm significância estatística.
+
+# Pseudo-R\^2
+
+```{r}
+pseudo_R2 = (min_log_likelihood - model_log_likelihood)/min_log_likelihood
+
+cat("pseudo-R^2:", pseudo_R2)
+```
+
+O modelo explica pouco dos dados.
+
+# Testes (ignorar)
+
+```{r}
+max_log_likelihood = sum(-RecreationDemand$trips + RecreationDemand$trips * ifelse(RecreationDemand$trips == 0, 1, log(RecreationDemand$trips)) - log(factorial(RecreationDemand$trips)))
+
+deviance = 2*(max_log_likelihood - model_log_likelihood)
+
+print(deviance)
+```
+
+```{r}
+RecreationDemand$userfee_num = ifelse(RecreationDemand$userfee == "yes", 1, 0)
+RecreationDemand$costC_100 = RecreationDemand$costC / 100
+RecreationDemand$costS_100 = RecreationDemand$costS / 100
+RecreationDemand$costH_100 = RecreationDemand$costH / 100
+
+head(RecreationDemand)
+```
+
+```{r}
+mean((RecreationDemand[RecreationDemand$quality != 0, ])$quality)
+```
+
+# INTERAÇÃO!
+
+```{r}
+modelteste = glm(trips ~ ski_num + income + userfee_num + costS_100 + costS_100 * income, data = RecreationDemand, family = poisson())
+summary(modelteste)
+
+teste_pred = predict(modelteste, type = "response")
+
+model_log_likelihood_teste = sum(-teste_pred + RecreationDemand$trips * log(teste_pred) - log(factorial(RecreationDemand$trips)))
+
+pseudo_R2_teste = (min_log_likelihood - model_log_likelihood_teste)/min_log_likelihood
+
+cat("pseudo-R^2:", pseudo_R2_teste, "\n")
+
+chi2_pearson_teste = sum(((RecreationDemand$trips - teste_pred)^2)/teste_pred)
+
+df_teste = modelteste$df.residual
+
+pvalue_teste = pchisq(chi2_pearson_teste, df_teste, lower.tail = FALSE)
+
+cat("p-valor:", pvalue_teste)
+```
+
+```{r}
+modelteste2 = glm(trips ~ ski_num + income + userfee_num + costS_100, data = RecreationDemand, family = poisson())
+summary(modelteste2)
+
+teste_pred = predict(modelteste2, type = "response")
+
+model_log_likelihood_teste = sum(-teste_pred + RecreationDemand$trips * log(teste_pred) - log(factorial(RecreationDemand$trips)))
+
+pseudo_R2_teste = (min_log_likelihood - model_log_likelihood_teste)/min_log_likelihood
+
+cat("pseudo-R^2:", pseudo_R2_teste, "\n")
+
+chi2_pearson_teste = sum(((RecreationDemand$trips - teste_pred)^2)/teste_pred)
+
+df_teste = modelteste2$df.residual
+
+pvalue_teste = pchisq(chi2_pearson_teste, df_teste, lower.tail = FALSE)
+
+cat("p-valor:", pvalue_teste)
+```
+
+```{r}
+C = modelteste2$deviance - modelteste$deviance
+
+df_diff = modelteste2$df.residual - modelteste$df.residual
+
+pvalue = pchisq(C, df_diff, lower.tail = FALSE)
+
+cat("Estatística C:", C, "\n")
+cat("pvalue:", pvalue)
+```
+
+# Teste de sobredispersão
+
+```{r}
+z = ((RecreationDemand$trips - trips_pred)^2 - RecreationDemand$trips)/trips_pred
+
+overdispersion_data = data.frame(z = z, trips_pred = trips_pred)
+
+overdispersion_model = glm(z ~ trips_pred + 0, data = overdispersion_data)
+summary(overdispersion_model)
+```
+
+O coeficiente é significativo. Portanto, há sobredispersão.
+
+# Modelos alternativos
+
+```{r}
+library(MASS)
+```
+
+```{r}
+RecreationDemand$userfee_num = ifelse(RecreationDemand$userfee == "yes", 1, 0)
+RecreationDemand$costH_100 = RecreationDemand$costH/100
+RecreationDemand$costC_100 = RecreationDemand$costC/100
+```
+
+```{r}
+head(RecreationDemand)
+```
+
+```{r}
+model_nb = glm.nb(trips ~ ski + income + quality + costS_100, data = RecreationDemand)
+summary(model_nb)
+```
+
+```{r}
+C_nb = model_nb$null.deviance - model_nb$deviance
+
+cat("C:", C_nb, "\n")
+
+diff_df_nb = model_nb$df.null - model_nb$df.residual
+
+pvalue_nb_C = pchisq(C_nb, diff_df_nb, lower.tail = FALSE)
+
+cat("p-valor:", pvalue_nb_C)
+```
+
+```{r}
+min_model_nb = glm.nb(trips ~ 1, data = RecreationDemand)
+summary(min_model_nb)
+
+min_trips_pred_nb = predict(min_model_nb, type = "response")
+trips_pred_nb = predict(model_nb, type = "response")
+
+min_log_likelihood_nb = sum(-min_trips_pred_nb + RecreationDemand$trips * log(min_trips_pred_nb) - log(factorial(RecreationDemand$trips)))
+
+model_log_likelihood_nb = sum(-trips_pred_nb + RecreationDemand$trips * log(trips_pred_nb) - log(factorial(RecreationDemand$trips)))
+
+pseudo_R2_nb = (min_log_likelihood_nb - model_log_likelihood_nb)/min_log_likelihood_nb
+
+cat("\npseudo-R^2:", pseudo_R2_nb)
+```
+
+```{r}
+mean = coef(min_model_nb)["(Intercept)"]
+estimated_variance = mean + mean^2/model_nb$theta
+
+cat("Variância estimada:", estimated_variance, "\n")
+cat("Variância amostral:", var(RecreationDemand$trips))
+```
+
+$$
+y = \alpha * \beta
+$$
+
+```{r}
+AIC(model, model_nb)
+```
+
+```{r}
+plot(residuals(model, type = "pearson"), ylim = c(-10, 40))
+plot(residuals(model_nb, type = "pearson"), ylim = c(-10, 40))
+```
+
+```{r}
+
+residuals_pois = RecreationDemand$trips - trips_pred
+residuals_nb = RecreationDemand$trips - trips_pred_nb
+```
+
+```{r}
+hist(residuals_pois, breaks = 100, xlim = c(-10, 10), ylim = c(0, 200))
+hist(residuals_nb, breaks = 100, xlim = c(-10, 10), ylim = c(0, 200))
+```
+
+```{r}
+plot(predict(model, type = "response"), residuals(model),
+     xlab = "Valores preditos", ylab = "Residuos de Pearson", ylim = c(-10, 40))
+abline(h = 0, col = "red")
+plot(predict(model, type = "response"), residuals(model, type = "response"),
+     xlab = "Valores preditos", ylab = "Residuos de Pearson", ylim = c(-10, 40))
+abline(h = 0, col = "red")
+
+#plot(predict(model_nb, type = "response"), residuals(model_nb),
+#     xlab = "Valores preditos", ylab = "Residuos de Pearson", ylim = c(-10, 40))
+#abline(h = 0, col = "red")
+```
+
+```{r}
+data("RecreationDemand")
+subset(RecreationDemand, quality == 1, select = costS)
+```
+
