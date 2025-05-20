@@ -37,6 +37,46 @@
 \makeatother
 \usepackage{xcolor}
 \usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -70,25 +110,26 @@
 
 \begin{document}
 
-\begin{titlepage}
-\centering
-{\LARGE \textbf{Sobredispersão em Modelos de Contagem}\\[1em]
+\begin{center}
+{\LARGE \textbf{Sobredispersão em Modelos de Contagem}\\
 Modelagem Estatística \par}
-\vspace{2cm}
+\vspace{0.5cm}
+
 {\large Pedro Henrique Coterli \par}
-\vfill
+
 {\large \today \par}
-\end{titlepage}
+\end{center}
 
 \section{1. Introdução}\label{introduuxe7uxe3o}
 
 O presente trabalho tem como objetivo investigar a sobredispersão em
 dados de contagem e seus efeitos no ajuste de modelos lineares
 generalizados (GLMs). Serão considerados modelos de regressão Poisson,
-Binomial Negativo e {[}TODO{]}, aplicados a dados de turismo da região
-do Texas, nos Estados Unidos. Busca-se avaliar como a sobredispersão
-afeta o desempenho desses modelos, bem como discutir estratégias para
-reduzir seus impactos e melhorar a qualidade dos ajustes.
+Binomial Negativo e Poisson inflado de zeros, aplicados a dados de
+turismo da região do Texas, nos Estados Unidos. Busca-se avaliar como a
+sobredispersão afeta o desempenho desses modelos, bem como discutir
+estratégias para reduzir seus impactos e melhorar a qualidade dos
+ajustes.
 
 \section{2. Métodos}\label{muxe9todos}
 
@@ -300,7 +341,53 @@ otimização em duas etapas:
 
 Esse processo é repetido até os parâmetros convergirem.
 
-\subsubsection{2.2.3. {[}TODO{]}}\label{todo}
+\subsubsection{2.2.3. Modelo Poisson inflado de
+zeros}\label{modelo-poisson-inflado-de-zeros}
+
+O modelo Poisson inflado de zeros (ZIP da sigla em inglês) é uma
+adaptação do modelo Poisson para cenários com excesso de zeros na
+variável resposta. É um modelo misto definido da seguinte
+forma\footnote{\url{https://mc-stan.org/docs/stan-users-guide/finite-mixtures.html\#zero-inflation}}:
+
+\[
+\begin{aligned}
+y_i = 0 \hspace{6em} &\text{ com probabilidade } \theta_i, \text{ e} \\
+y_i \sim \text{Poisson}(\mu_i) \hspace{1.5em} &\text{  com probabilidade } 1-\theta_i
+\end{aligned}
+\]
+
+onde \(\beta\) é estimado por um modelo Poisson para gerar
+\(\mu_i = e^{Z_i^T\beta}\) e \(\gamma\) é estimado por um modelo
+logístico para gerar \(\theta_i = \text{logit}^{-1}(W_i^T\gamma)\).
+Aqui, \(Z_i\) e \(W_i\) são vetores com covariáveis do i-ésimo ponto de
+dado, podendo conter variáveis diferentes ou comuns e até dimensões
+diferentes.
+
+Assim, para o i-ésimo ponto de dado, existe probabilidade \(\theta_i\)
+de observar um 0 e probabilidade \(1-\theta_i\) de observar uma amostra
+de uma distribuição \(\text{Poisson}(\mu_i)\). Com isso, esse modelo
+permite separar zeros estruturais, ou seja, que não são explicados pelas
+covariáveis explicativas da contagem, de zeros ocasionais, gerados pela
+combinação de valores dessas covariáveis. Dessa forma, ele é capaz de
+modelar todos esses zeros, que prejudicariam o desempenho de um modelo
+Poisson convencional.
+
+Sua função de verossimilhança pode ser escrita como a seguir:
+
+\[
+p(y_i | \theta_i, \mu_i) = 
+\begin{cases}
+\theta_i + (1-\theta_i) \cdot e^{-\mu_i}, & \text{se } y_i = 0 \\
+(1-\theta_i) \cdot \dfrac{{\mu_i}^{y_i} e^{-\mu_i}}{y_i!}, & \text{se } y_i > 0
+\end{cases}
+\]
+
+Para estimar os coeficientes \(\beta\) e \(\gamma\), será aplicada a
+estratégia de máxima verossimilhança, utilizando as mesmas
+justificativas dos modelos anteriores. Além disso, para realizar a
+aproximação numérica, serão utilizados métodos numéricos que não serão
+discutidos aqui, dada sua complexidade. O método de Fisher Scoring não
+pode ser aplicado diretamente devido à estrutura mista do problema.
 
 \subsection{2.3. Teste de sobredispersão sob modelo
 Poisson}\label{teste-de-sobredispersuxe3o-sob-modelo-poisson}
@@ -485,9 +572,10 @@ visualizações, foi utilizado o software estatístico R. A biblioteca
 para a obtenção dos dados, e a \textbf{ggplot2}\footnote{\url{https://ggplot2.tidyverse.org}}
 e a \textbf{GGally}\footnote{\url{https://cran.r-project.org/web/packages/GGally/index.html}},
 para a geração dos gráficos. Além disso, foi utilizado um método da
-biblioteca \textbf{MASS}\footnote{\url{https://rdrr.io/cran/AER/man/RecreationDemand.html}}
-para o ajuste do modelo Binomial Negativo e {[}TODO{]} para o ajuste do
-modelo de inflação de zeros.
+biblioteca \textbf{MASS}\footnote{\url{https://cran.r-project.org/web/packages/MASS/index.html}}
+para o ajuste do modelo Binomial Negativo e um da biblioteca
+\textbf{glmmTMB}\footnote{\url{https://cran.r-project.org/web/packages/glmmTMB/index.html}}
+para o ajuste do modelo de inflação de zeros.
 
 \section{3. Resultados}\label{resultados}
 
@@ -540,10 +628,9 @@ Abaixo está a distribuição dessa variável:
 
 Mais uma vez, há um grande número de valores iguais a zero. No entanto,
 a razão é diferente da fornecida para a variável \textbf{trips}: segundo
-a documentação dos dados\footnote{\url{https://rdrr.io/cran/AER/man/RecreationDemand.html}},
-esses valores correspondem a indivíduos que não haviam visitado o lago e
-que, com isso, não avaliaram a qualidade de suas instalações. Portanto,
-são equivalentes a valores desconhecidos.
+a documentação dos dados, esses valores correspondem a indivíduos que
+não haviam visitado o lago e que, com isso, não avaliaram a qualidade de
+suas instalações. Portanto, são equivalentes a valores desconhecidos.
 
 A seguir, é apresentada a distribuição dos valores de \textbf{trips} em
 função da covariável \textbf{quality}, sendo plotados todos os pontos à
@@ -796,8 +883,7 @@ relevantes para a modelagem de \textbf{trips}.
 
 \textbf{Pseudo-\(\text{R}^2\)}
 
-Por último, será calculado o valor do pseudo-\(\text{R}^2\) desse
-modelo:
+Agora, será calculado o valor do pseudo-\(\text{R}^2\) desse modelo:
 
 \begin{verbatim}
 ## Pseudo-R2: 0.3594313
@@ -808,6 +894,38 @@ ajustado obteve uma melhoria de aproximadamente \(36\%\) em seu
 desempenho quando comparado com o modelo minimal da mesma família, o que
 indica um resultado razoável, mas que pode ser melhorado com o uso de
 outros modelos, como será apresentado a seguir.
+
+\textbf{Desempenho da modelagem dos valores zero}
+
+Por último, será analisado o desempenho desse modelo na estimação dos
+valores zero do dado. Para isso, será gerada, para cada dado, uma
+previsão para \textbf{trips} por meio de uma amostragem da distribuição
+Poisson com a média sendo a média estimada pelo modelo para esse ponto
+de dado. Em seguida, serão contabilizadas quantas dessas previsões
+receberam o valor 0. Esse processo será realizado 1000 vezes e a média
+dos resultados será considerada, a fim de obter uma estimativa estável.
+
+Abaixo estão os resultados obtidos:
+
+\begin{verbatim}
+## -> Número de 0s:
+\end{verbatim}
+
+\begin{verbatim}
+## No dado:   417
+\end{verbatim}
+
+\begin{verbatim}
+## Previstos: 260.458
+\end{verbatim}
+
+Como observado, o modelo Poisson subestima a ocorrência de zeros em
+comparação à quantidade observada nos dados, o que é confirmado pelo
+gráfico dos resíduos mostrado acima. Nele, há uma grande quantidade de
+resíduos pequenos negativos, sugerindo que o modelo tenha atribuído para
+esses pontos valores pequenos da variável resposta, mas ainda maiores
+que 0. Isso levará, mais adiante, ao ajuste de outros modelos de modo a
+tentar mitigar esse efeito.
 
 \subsection{3.3. Teste para
 sobredispersão}\label{teste-para-sobredispersuxe3o}
@@ -937,7 +1055,7 @@ modelo}\label{avaliauxe7uxe3o-do-modelo-1}
 A primeira análise realizada será sobre a distribuição dos resíduos de
 Pearson:
 
-\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-22-1} \end{center}
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-23-1} \end{center}
 
 É notável a concentração dos resíduos em valores próximos de zero, o que
 sugere um bom ajuste. Além disso, nota-se que os poucos resíduos com
@@ -982,13 +1100,105 @@ desse modelo:
 
 Dessa forma, segundo essa estatística, o modelo Binomial Negativo
 ajustado gerou uma melhoria de aproximadamente \(15\%\) no desempenho
-quando comparado com o modelo minimal da mesma família. Isso pode
-parecer fraco, mas mais à frente será mostrado que esse modelo performa
-melhor que o Poisson.
+quando comparado com o modelo minimal da mesma família. Isso parece
+fraco, mas pode ser causado pelo fato de a verossimilhança do modelo
+nulo já ser considerável, o que diminui a relevância de ajustes
+melhores.
 
-Esse valor é menor que o obtido pelo modelo Poisson, mas, como explicado
-na seção 2.4.5, esses valores não são comparáveis por virem de modelos
-de famílias diferentes.
+Além disso, esse valor é menor que o obtido pelo modelo Poisson, mas,
+como explicado na seção 2.4.5, esses valores não são comparáveis por
+virem de modelos de famílias diferentes.
+
+\subsection{3.5. Ajuste do modelo Poisson inflado de
+zeros}\label{ajuste-do-modelo-poisson-inflado-de-zeros}
+
+Para o ajuste do modelo Poisson inflado de zeros, foram escolhidas, com
+base em alguns testes, a covariável \textbf{quality} para a modelagem da
+etapa logística e as demais para a modelagem da etapa de contagem.
+Assim, feito o ajuste, o resultado obtido foi o seguinte:
+
+\begin{verbatim}
+##  Family: poisson  ( log )
+## Formula:          trips ~ ski + income_c + costS_100_c
+## Zero inflation:         ~quality
+## Data: RecreationDemand
+## 
+##       AIC       BIC    logLik -2*log(L)  df.resid 
+##    2631.8    2658.7   -1309.9    2619.8       653 
+## 
+## 
+## Conditional model:
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)  1.38474    0.04610  30.037  < 2e-16 ***
+## skiyes       0.52836    0.05752   9.185  < 2e-16 ***
+## income_c    -0.12716    0.01981  -6.418 1.38e-10 ***
+## costS_100_c -1.50350    0.10260 -14.654  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Zero-inflation model:
+##             Estimate Std. Error z value Pr(>|z|)    
+## (Intercept)   2.9731     0.2283   13.02   <2e-16 ***
+## quality      -1.6184     0.1213  -13.34   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+Dada a seleção prévia realizada, todos os coeficientes mostram-se
+relevantes.
+
+A seguir, esse modelo será avaliado segundo as mesmas métricas aplicadas
+sobre os modelos anteriores.
+
+\subsubsection{3.5.1. Avaliação do
+ajuste}\label{avaliauxe7uxe3o-do-ajuste}
+
+\textbf{Resíduos de Pearson}
+
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-27-1} \end{center}
+
+Nota-se uma concentração dos resíduos mais proeminentes em valores
+positivos, indicando que, assim como o modelo Poisson, o modelo ZIP não
+foi tão eficiente ao absorver a variância gerada pela sobredispersão.
+Isso é perfeitamente válido, já que, apesar de ser um modelo mais
+elaborado, a base de sua modelagem de contagem ainda é uma distribuição
+Poisson convencional, que considera a média e a variância iguais. Na
+próxima seção, será verificado se ele conseguiu mitigar o problema do
+excesso de zeros.
+
+\textbf{Estatística qui-quadrado de razão de verossimilhança}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# 1. Obtenha as probabilidades da parte de zero inflado}
+\NormalTok{p\_zero }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(model\_zip, }\AttributeTok{type =} \StringTok{"zprob"}\NormalTok{)         }
+
+\CommentTok{\# 2. Obtenha os valores esperados da parte Poisson}
+\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(model\_zip, }\AttributeTok{type =} \StringTok{"conditional"}\NormalTok{)       }
+
+\CommentTok{\# 3. Calcule a probabilidade total de zero}
+\NormalTok{p\_zero\_total }\OtherTok{\textless{}{-}}\NormalTok{ p\_zero }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ p\_zero) }\SpecialCharTok{*} \FunctionTok{exp}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{mu)}
+
+\CommentTok{\# 4. Simulação}
+\NormalTok{n\_sim }\OtherTok{\textless{}{-}} \DecValTok{1000}
+\NormalTok{zero\_counts }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(n\_sim)}
+
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{n\_sim) \{}
+\NormalTok{  sampled }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(p\_zero\_total), }\AttributeTok{size =} \DecValTok{1}\NormalTok{, }\AttributeTok{prob =}\NormalTok{ p\_zero\_total)}
+\NormalTok{  zero\_counts[i] }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(sampled)}
+\NormalTok{\}}
+
+\CommentTok{\# 5. Resultados}
+\NormalTok{mean\_predicted\_zeros }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(zero\_counts)}
+\NormalTok{ci }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(zero\_counts, }\FunctionTok{c}\NormalTok{(}\FloatTok{0.025}\NormalTok{, }\FloatTok{0.975}\NormalTok{))}
+
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Média total de zeros previstos em"}\NormalTok{, n\_sim, }\StringTok{"simulações:"}\NormalTok{, mean\_predicted\_zeros, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Média total de zeros previstos em 1000 simulações: 420.449
+\end{verbatim}
 
 \section{Discussão e Conclusão}\label{discussuxe3o-e-conclusuxe3o}
 

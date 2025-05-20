@@ -4,15 +4,17 @@ header-includes:
   - \usepackage{setspace}
 ---
 
-\begin{titlepage}
-\centering
-{\LARGE \textbf{Sobredispersão em Modelos de Contagem}\\[1em]
+```{=latex}
+\begin{center}
+{\LARGE \textbf{Sobredispersão em Modelos de Contagem}\\
 Modelagem Estatística \par}
-\vspace{2cm}
+\vspace{0.5cm}
+
 {\large Pedro Henrique Coterli \par}
-\vfill
+
 {\large \today \par}
-\end{titlepage}
+\end{center}
+```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -27,7 +29,7 @@ Sys.setlocale("LC_ALL", "Portuguese")
 
 # 1. Introdução
 
-O presente trabalho tem como objetivo investigar a sobredispersão em dados de contagem e seus efeitos no ajuste de modelos lineares generalizados (GLMs). Serão considerados modelos de regressão Poisson, Binomial Negativo e [TODO], aplicados a dados de turismo da região do Texas, nos Estados Unidos. Busca-se avaliar como a sobredispersão afeta o desempenho desses modelos, bem como discutir estratégias para reduzir seus impactos e melhorar a qualidade dos ajustes.
+O presente trabalho tem como objetivo investigar a sobredispersão em dados de contagem e seus efeitos no ajuste de modelos lineares generalizados (GLMs). Serão considerados modelos de regressão Poisson, Binomial Negativo e Poisson inflado de zeros, aplicados a dados de turismo da região do Texas, nos Estados Unidos. Busca-se avaliar como a sobredispersão afeta o desempenho desses modelos, bem como discutir estratégias para reduzir seus impactos e melhorar a qualidade dos ajustes.
 
 # 2. Métodos
 
@@ -136,7 +138,34 @@ Além disso, será novamente aplicado o método de otimização por Fisher Scori
 
 Esse processo é repetido até os parâmetros convergirem.
 
-### 2.2.3. [TODO]
+### 2.2.3. Modelo Poisson inflado de zeros
+
+O modelo Poisson inflado de zeros (ZIP da sigla em inglês) é uma adaptação do modelo Poisson para cenários com excesso de zeros na variável resposta. É um modelo misto definido da seguinte forma[^4]:
+
+[^4]: https://mc-stan.org/docs/stan-users-guide/finite-mixtures.html#zero-inflation
+
+$$
+\begin{aligned}
+y_i = 0 \hspace{6em} &\text{ com probabilidade } \theta_i, \text{ e} \\
+y_i \sim \text{Poisson}(\mu_i) \hspace{1.5em} &\text{  com probabilidade } 1-\theta_i
+\end{aligned}
+$$
+
+onde $\beta$ é estimado por um modelo Poisson para gerar $\mu_i = e^{Z_i^T\beta}$ e $\gamma$ é estimado por um modelo logístico para gerar $\theta_i = \text{logit}^{-1}(W_i^T\gamma)$. Aqui, $Z_i$ e $W_i$ são vetores com covariáveis do i-ésimo ponto de dado, podendo conter variáveis diferentes ou comuns e até dimensões diferentes.
+
+Assim, para o i-ésimo ponto de dado, existe probabilidade $\theta_i$ de observar um 0 e probabilidade $1-\theta_i$ de observar uma amostra de uma distribuição $\text{Poisson}(\mu_i)$. Com isso, esse modelo permite separar zeros estruturais, ou seja, que não são explicados pelas covariáveis explicativas da contagem, de zeros ocasionais, gerados pela combinação de valores dessas covariáveis. Dessa forma, ele é capaz de modelar todos esses zeros, que prejudicariam o desempenho de um modelo Poisson convencional.
+
+Sua função de verossimilhança pode ser escrita como a seguir:
+
+$$
+p(y_i | \theta_i, \mu_i) = 
+\begin{cases}
+\theta_i + (1-\theta_i) \cdot e^{-\mu_i}, & \text{se } y_i = 0 \\
+(1-\theta_i) \cdot \dfrac{{\mu_i}^{y_i} e^{-\mu_i}}{y_i!}, & \text{se } y_i > 0
+\end{cases}
+$$
+
+Para estimar os coeficientes $\beta$ e $\gamma$, será aplicada a estratégia de máxima verossimilhança, utilizando as mesmas justificativas dos modelos anteriores. Além disso, para realizar a aproximação numérica, serão utilizados métodos numéricos que não serão discutidos aqui, dada sua complexidade. O método de Fisher Scoring não pode ser aplicado diretamente devido à estrutura mista do problema.
 
 ## 2.3. Teste de sobredispersão sob modelo Poisson
 
@@ -248,12 +277,13 @@ No entanto, vale destacar que essa estatística não é adequada para a compara�
 
 ## 2.5. Ferramentas
 
-Para a realização de todas as análises, ajustes de modelos e gerações de visualizações, foi utilizado o software estatístico R. A biblioteca **AER**[^4] foi utilizada para a obtenção dos dados, e a **ggplot2**[^5] e a **GGally**[^6], para a geração dos gráficos. Além disso, foi utilizado um método da biblioteca **MASS**[^7] para o ajuste do modelo Binomial Negativo e [TODO] para o ajuste do modelo de inflação de zeros.
+Para a realização de todas as análises, ajustes de modelos e gerações de visualizações, foi utilizado o software estatístico R. A biblioteca **AER**[^5] foi utilizada para a obtenção dos dados, e a **ggplot2**[^6] e a **GGally**[^7], para a geração dos gráficos. Além disso, foi utilizado um método da biblioteca **MASS**[^8] para o ajuste do modelo Binomial Negativo e um da biblioteca **glmmTMB**[^9] para o ajuste do modelo de inflação de zeros.
 
-[^4]: https://rdrr.io/cran/AER/
-[^5]: https://ggplot2.tidyverse.org
-[^6]: https://cran.r-project.org/web/packages/GGally/index.html
-[^7]: https://cran.r-project.org/web/packages/MASS/index.html
+[^5]: https://rdrr.io/cran/AER/
+[^6]: https://ggplot2.tidyverse.org
+[^7]: https://cran.r-project.org/web/packages/GGally/index.html
+[^8]: https://cran.r-project.org/web/packages/MASS/index.html
+[^9]: https://cran.r-project.org/web/packages/glmmTMB/index.html
 
 # 3. Resultados
 
@@ -327,9 +357,7 @@ barplot(
   cex.names = 0.75)
 ```
 
-Mais uma vez, há um grande número de valores iguais a zero. No entanto, a razão é diferente da fornecida para a variável **trips**: segundo a documentação dos dados[^7], esses valores correspondem a indivíduos que não haviam visitado o lago e que, com isso, não avaliaram a qualidade de suas instalações. Portanto, são equivalentes a valores desconhecidos.
-
-[^7]: https://rdrr.io/cran/AER/man/RecreationDemand.html
+Mais uma vez, há um grande número de valores iguais a zero. No entanto, a razão é diferente da fornecida para a variável **trips**: segundo a documentação dos dados, esses valores correspondem a indivíduos que não haviam visitado o lago e que, com isso, não avaliaram a qualidade de suas instalações. Portanto, são equivalentes a valores desconhecidos.
 
 A seguir, é apresentada a distribuição dos valores de **trips** em função da covariável **quality**, sendo plotados todos os pontos à esquerda (com jitter para facilitar a visualização) e apenas as médias dentro de cada valor de **quality** à direita.
 
@@ -689,7 +717,7 @@ O valor de $C$ é altamente significativo quando comparado à distribuição qui
 
 **Pseudo-$\text{R}^2$**
 
-Por último, será calculado o valor do pseudo-$\text{R}^2$ desse modelo:
+Agora, será calculado o valor do pseudo-$\text{R}^2$ desse modelo:
 
 ```{r, echo = FALSE}
 min_model_poisson = glm(trips ~ 1, data = RecreationDemand, family = poisson())
@@ -703,6 +731,31 @@ cat("Pseudo-R2:", pseudo_R2_poisson)
 ```
 
 Com base nessa estatística, é possível inferir que o modelo de Poisson ajustado obteve uma melhoria de aproximadamente $36\%$ em seu desempenho quando comparado com o modelo minimal da mesma família, o que indica um resultado razoável, mas que pode ser melhorado com o uso de outros modelos, como será apresentado a seguir.
+
+**Desempenho da modelagem dos valores zero**
+
+Por último, será analisado o desempenho desse modelo na estimação dos valores zero do dado. Para isso, será gerada, para cada dado, uma previsão para **trips** por meio de uma amostragem da distribuição Poisson com a média sendo a média estimada pelo modelo para esse ponto de dado. Em seguida, serão contabilizadas quantas dessas previsões receberam o valor 0. Esse processo será realizado 1000 vezes e a média dos resultados será considerada, a fim de obter uma estimativa estável.
+
+Abaixo estão os resultados obtidos:
+
+```{r, echo = FALSE}
+predict_poisson = predict(model_poisson, type = "response")
+
+count_zeros_poisson = function(lambda)
+{
+  pred = rpois(length(trips), lambda = lambda)
+  sum(pred == 0)
+}
+
+zero_counts_poisson = replicate(1000, count_zeros_poisson(predict_poisson))
+mean_zeros_poisson = mean(zero_counts_poisson)
+
+cat("-> Número de 0s:\n")
+cat("No dado:  ", sum(trips == 0), "\n")
+cat("Previstos:", mean_zeros_poisson, "\n")
+```
+
+Como observado, o modelo Poisson subestima a ocorrência de zeros em comparação à quantidade observada nos dados, o que é confirmado pelo gráfico dos resíduos mostrado acima. Nele, há uma grande quantidade de resíduos pequenos negativos, sugerindo que o modelo tenha atribuído para esses pontos valores pequenos da variável resposta, mas ainda maiores que 0. Isso levará, mais adiante, ao ajuste de outros modelos de modo a tentar mitigar esse efeito.
 
 ## 3.3. Teste para sobredispersão
 
@@ -802,6 +855,75 @@ cat("Pseudo-R2:", pseudo_R2_nb)
 Dessa forma, segundo essa estatística, o modelo Binomial Negativo ajustado gerou uma melhoria de aproximadamente $15\%$ no desempenho quando comparado com o modelo minimal da mesma família. Isso parece fraco, mas pode ser causado pelo fato de a verossimilhança do modelo nulo já ser considerável, o que diminui a relevância de ajustes melhores.
 
 Além disso, esse valor é menor que o obtido pelo modelo Poisson, mas, como explicado na seção 2.4.5, esses valores não são comparáveis por virem de modelos de famílias diferentes.
+
+## 3.5. Ajuste do modelo Poisson inflado de zeros
+
+Para o ajuste do modelo Poisson inflado de zeros, foram escolhidas, com base em alguns testes, a covariável **quality** para a modelagem da etapa logística e as demais para a modelagem da etapa de contagem. Assim, feito o ajuste, o resultado obtido foi o seguinte:
+
+```{r, echo = FALSE}
+if(!require(glmmTMB)) install.packages("glmmTMB")
+require(glmmTMB)
+
+model_zip = glmmTMB(trips ~ ski + income_c + costS_100_c,
+                    ziformula = ~ quality,
+                    family = poisson,
+                    data = RecreationDemand)
+
+summary(model_zip)
+```
+
+Dada a seleção prévia realizada, todos os coeficientes mostram-se relevantes.
+
+A seguir, esse modelo será avaliado segundo as mesmas métricas aplicadas sobre os modelos anteriores.
+
+### 3.5.1. Avaliação do ajuste
+
+**Resíduos de Pearson**
+
+```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
+par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+plot(fitted(model_zip), residuals(model_zip, type = "pearson"),
+  main = "Resíduos de Pearson x Valor previsto (ZIP)",
+  xlab = "Valor previsto",
+  ylab = "Resíduo",
+  ylim = c(-5, 45),
+  cex.main = 0.8, 
+  cex.lab = 0.7,
+  cex.axis = 0.6)
+abline(h = 0, col = "red")
+```
+
+Nota-se uma concentração dos resíduos mais proeminentes em valores positivos, indicando que, assim como o modelo Poisson, o modelo ZIP não foi tão eficiente ao absorver a variância gerada pela sobredispersão. Isso é perfeitamente válido, já que, apesar de ser um modelo mais elaborado, a base de sua modelagem de contagem ainda é uma distribuição Poisson convencional, que considera a média e a variância iguais. Na próxima seção, será verificado se ele conseguiu mitigar o problema do excesso de zeros.
+
+**Estatística qui-quadrado de razão de verossimilhança**
+
+
+
+```{r}
+# 1. Obtenha as probabilidades da parte de zero inflado
+p_zero <- predict(model_zip, type = "zprob")         
+
+# 2. Obtenha os valores esperados da parte Poisson
+mu <- predict(model_zip, type = "conditional")       
+
+# 3. Calcule a probabilidade total de zero
+p_zero_total <- p_zero + (1 - p_zero) * exp(-mu)
+
+# 4. Simulação
+n_sim <- 1000
+zero_counts <- numeric(n_sim)
+
+for (i in 1:n_sim) {
+  sampled <- rbinom(length(p_zero_total), size = 1, prob = p_zero_total)
+  zero_counts[i] <- sum(sampled)
+}
+
+# 5. Resultados
+mean_predicted_zeros <- mean(zero_counts)
+ci <- quantile(zero_counts, c(0.025, 0.975))
+
+cat("Média total de zeros previstos em", n_sim, "simulações:", mean_predicted_zeros, "\n")
+```
 
 
 
