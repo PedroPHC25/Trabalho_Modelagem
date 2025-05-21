@@ -1,5 +1,7 @@
 ---
-output: pdf_document
+output:
+  pdf_document:
+    latex_engine: xelatex
 header-includes:
   - \usepackage{setspace}
 ---
@@ -42,11 +44,11 @@ Os dados utilizados para este estudo foram retirados da biblioteca Applied Econo
 
 Estão presentes 659 observações com 8 variáveis, que estão descritas a seguir:
 
--   **trips**: assume valores naturais (incluindo 0) e representa o número de viagens de barco recreativas;
--   **quality**: assume valores de 1 a 5 e classifica subjetivamente a qualidade da instalação;
--   **ski**: assume valores "yes" ou "no" e indica se o indivíduo estava praticando esqui aquático no lago;
+-   **trips**: assume valores naturais (incluindo 0) e representa o número de viagens de barco recreativas ao lago Somerville em 1980;
+-   **quality**: assume valores de 1 a 5 e representa a classificação fornecida pelo indivíduo sobre a qualidade das instalações do lago;
+-   **ski**: assume valores "yes" ou "no" e indica se o indivíduo praticava (ou se praticaria, caso nunca tivesse ido) esqui aquático no lago;
 -   **income**: assume valores naturais e representa a renda familiar anual do entrevistado (milhares de dólares);
--   **userfee**: assume valores "yes" ou "no" e indica se o indivíduo pagou uma taxa anual de uso no Lago Somerville;
+-   **userfee**: assume valores "yes" ou "no" e indica se o indivíduo pagou uma taxa anual de uso do Lago Somerville;
 -   **costC**: assume valores positivos e representa as despesas estimadas para visitar o Lago Conroe (em dólares);
 -   **costS**: assume valores positivos e representa as despesas estimadas para visitar o Lago Somerville (em dólares);
 -   **costH**: assume valores positivos e representa as despesas estimadas para visitar o Lago Houston (em dólares).
@@ -225,7 +227,7 @@ $$
 X^2 = \sum r_i^2
 $$
 
-citada por Dobson (2001). De acordo com a autora, sob a hipótese de que o modelo está correto, essa estatística teria aproximadamente a distribuição $\chi^2(N-p)$, onde $N$ é o número de pontos de dados e $p$ é o número de parâmetros do modelo. No entanto, essa aproximação é pobre se as frequências esperadas são muito pequenas, que é o caso desse problema, como será mostrado mais adiante. Portanto, a utilização dessa estatística não é viável.
+citada por Dobson (2018). De acordo com a autora, sob a hipótese de que o modelo está correto, essa estatística teria aproximadamente a distribuição $\chi^2(N-p)$, onde $N$ é o número de pontos de dados e $p$ é o número de parâmetros do modelo. No entanto, essa aproximação é pobre se as frequências esperadas são muito pequenas, que é o caso desse problema, como será mostrado mais adiante. Portanto, a utilização dessa estatística não é viável.
 
 ### 2.4.3. Estatística qui-quadrado de razão de verossimilhança
 
@@ -249,7 +251,7 @@ $$
 
 onde $l(\dot{\beta}; y)$ é a log-verossimilhança do modelo saturado (ou seja, com o número máximo de parâmetros que podem ser estimados) avaliada em seu EMV.
 
-Segundo Dobson (2001), a distribuição amostral aproximada para $C$ é $\chi^2(p-1)$ sob a hipótese de que todos os $p$ parâmetros, exceto o termo do intercepto, são zero. Assim, $C$ é uma estatística de teste para a hipótese de que nenhuma das covariáveis é necessária para um modelo parcimonioso. Dessa forma, se o valor de $C$ for estatisticamente significativo comparado com essa distribuição qui-quadrado, então é altamente provável que as covariáveis utilizadas sejam relevantes.
+Segundo Dobson (2018), a distribuição amostral aproximada para $C$ é $\chi^2(p-1)$ sob a hipótese de que todos os $p$ parâmetros, exceto o termo do intercepto, são zero. Assim, $C$ é uma estatística de teste para a hipótese de que nenhuma das covariáveis é necessária para um modelo parcimonioso. Dessa forma, se o valor de $C$ for estatisticamente significativo comparado com essa distribuição qui-quadrado, então é altamente provável que as covariáveis utilizadas sejam relevantes.
 
 ### 2.4.4. AIC
 
@@ -271,20 +273,19 @@ $$
 \text{pseudo-R}^2 = \dfrac{l(\tilde{\beta}; y) - l(\hat{\beta}; y)}{l(\tilde{\beta}; y)}
 $$
 
-Segundo Dobson (2001), ele pode representar a melhora proporcional na função de log-verossimilhança ocasionada pelos termos no modelo de interesse, comparada ao modelo minimal. Assim, assume valores entre 0 e 1, com valores próximos de 0 indicando ajuste ruim e valores próximos de 1 indicando ótimo ajuste.
+Segundo Dobson (2018), ele pode representar a melhora proporcional na função de log-verossimilhança ocasionada pelos termos no modelo de interesse, comparada ao modelo minimal. Assim, assume valores entre 0 e 1, com valores próximos de 0 indicando ajuste ruim e valores próximos de 1 indicando ótimo ajuste.
 
 No entanto, vale destacar que essa estatística não é adequada para a comparação de modelos de famílias diferentes, dado que as funções de log-verossimilhança podem possuir escalas distintas. Assim, ela será utilizada apenas para a avaliação interna de modelos.
 
 ## 2.5. Ferramentas
 
-Para a realização de todas as análises, ajustes de modelos e gerações de visualizações, foi utilizado o software estatístico R. A biblioteca **AER**[^5] foi utilizada para a obtenção dos dados, e a **ggplot2**[^6] e a **GGally**[^7], para a geração dos gráficos. Além disso, foi utilizado um método da biblioteca **MASS**[^8] para o ajuste do modelo Binomial Negativo e um da biblioteca **glmmTMB**[^9] para o ajuste do modelo de inflação de zeros. Por fim, a biblioteca **modelsummary**[^10] foi aplicada na geração de algumas das tabelas presentes nesse projeto.
+Para a realização de todas as análises, ajustes de modelos e gerações de visualizações, foi utilizado o software estatístico R. A biblioteca **AER**[^5] foi utilizada para a obtenção dos dados, e a **ggplot2**[^6] e a **GGally**[^7], para a geração dos gráficos. Além disso, foi utilizado um método da biblioteca **MASS**[^8] para o ajuste do modelo Binomial Negativo e um da biblioteca **glmmTMB**[^9] para o ajuste do modelo de inflação de zeros.
 
 [^5]: https://rdrr.io/cran/AER/
 [^6]: https://ggplot2.tidyverse.org
 [^7]: https://cran.r-project.org/web/packages/GGally/index.html
 [^8]: https://cran.r-project.org/web/packages/MASS/index.html
 [^9]: https://cran.r-project.org/web/packages/glmmTMB/index.html
-[^10]: https://cran.r-project.org/web/packages/modelsummary/index.html
 
 # 3. Resultados
 
@@ -733,31 +734,6 @@ cat("Pseudo-R2:", pseudo_R2_poisson)
 
 Com base nessa estatística, é possível inferir que o modelo de Poisson ajustado obteve uma melhoria de aproximadamente $36\%$ em seu desempenho quando comparado com o modelo minimal da mesma família, o que indica um resultado razoável, mas que pode ser melhorado com o uso de outros modelos, como será apresentado a seguir.
 
-**Desempenho da modelagem dos valores zero**
-
-Por último, será analisado o desempenho desse modelo na estimação dos valores zero do dado. Para isso, será gerada, para cada dado, uma previsão para **trips** por meio de uma amostragem da distribuição Poisson com a média sendo a média estimada pelo modelo para esse ponto de dado. Em seguida, serão contabilizadas quantas dessas previsões receberam o valor 0. Esse processo será realizado 1000 vezes e a média dos resultados será considerada, a fim de obter uma estimativa estável.
-
-Abaixo estão os resultados obtidos:
-
-```{r, echo = FALSE}
-predict_poisson = predict(model_poisson, type = "response")
-
-count_zeros_poisson = function(lambda)
-{
-  pred = rpois(length(trips), lambda = lambda)
-  sum(pred == 0)
-}
-
-zero_counts_poisson = replicate(1000, count_zeros_poisson(predict_poisson))
-mean_zeros_poisson = mean(zero_counts_poisson)
-
-cat("-> Número de 0s:\n")
-cat("No dado:  ", sum(trips == 0), "\n")
-cat("Previstos:", mean_zeros_poisson, "\n")
-```
-
-Como observado, o modelo Poisson subestima a ocorrência de zeros em comparação à quantidade observada nos dados, o que é confirmado pelo gráfico dos resíduos mostrado acima. Nele, há uma grande quantidade de resíduos pequenos negativos, sugerindo que o modelo tenha atribuído para esses pontos valores pequenos da variável resposta, mas ainda maiores que 0. Isso levará, mais adiante, ao ajuste de outros modelos de modo a tentar mitigar esse efeito.
-
 ## 3.3. Teste para sobredispersão
 
 Nesse momento, será realizado o teste de sobredispersão definido na seção 2.3, aplicado sobre os dados de interesse. Após o ajuste da estatística de teste às previsões, o resultado obtido foi o seguinte:
@@ -941,67 +917,175 @@ Portanto, esse modelo apresenta uma melhoria de aproximadamente $25\%$ na veross
 
 ## 3.6. Comparação dos modelos
 
-Finalmente, nesta seção, será efetuada a comparação dos desempenhos dos 3 modelos ajustados, sendo analisados, para esse fim, seus coeficientes ajustados, suas distribuições de resíduos de Pearson, suas estatísticas AIC (definido e justificado na seção 2.4.4) e seus resultados na modelagem dos valores zero.
+Finalmente, nesta seção, será efetuada a comparação dos desempenhos dos três modelos ajustados, analisando-se, para esse fim, seus coeficientes estimados, as distribuições de seus resíduos de Pearson, suas estatísticas AIC (definido e justificado na seção 2.4.4) e seus resultados na modelagem dos valores zero.
 
-### 3.6.1. Significância dos coeficientes
+### 3.6.1. Coeficientes estimados
 
-A seguir, temos uma tabela com os valores estimados por cada modelo para os coeficientes de cada covariável utilizada. Vale lembrar que a interpretação desses parâmetros pode diferir entre os modelos, principalmente para o modelo misto ZIP.
+A seguir, apresenta-se uma tabela com os valores estimados por cada modelo para os coeficientes de cada covariável utilizada. Vale lembrar que a interpretação desses parâmetros varia entre os modelos, principalmente no caso do modelo misto ZIP.
 
 ```{r, echo = FALSE}
-library(broom)
-library(dplyr)
-library(tidyr)
-library(purrr)
+coef_poisson = coef(model_poisson)
+coef_nb = coef(model_nb)
+coef_zip_poisson = fixef(model_zip)$cond
+coef_zip_bin = fixef(model_zip)$zi
 
-models <- list(
-  Poisson = model_poisson,
-  NegBin  = model_nb,
-  ZIP     = model_zip
+all_terms <- union(names(coef_poisson), union(names(coef_nb), union(names(coef_zip_poisson), names(coef_zip_bin))))
+
+coef_table <- data.frame(
+  Termo = all_terms,
+  Poisson = coef_poisson[all_terms],
+  NegBin = coef_nb[all_terms],
+  ZIP_Poisson = coef_zip_poisson[all_terms],
+  ZIP_Bin = coef_zip_bin[all_terms]
 )
 
-coefs <- map_df(models, tidy, .id = "Model")
-
-coefs_wide <- coefs %>%
-  select(Model, term, estimate) %>%
-  pivot_wider(names_from = Model, values_from = estimate)
-
-print(coefs_wide)
+knitr::kable(coef_table, row.names = FALSE)
 ```
+
+Em resumo, todos os modelos apontam direções semelhantes nos efeitos das covariáveis utilizadas sobre a variável resposta **trips**, o que pode ser observado pelos sinais dos coeficientes estimados em cada modelo. Os únicos casos que não obedecem a esse padrão são os interceptos e o coeficiente de **quality**. Com relação a esse último, enquanto os modelos de Poisson e Binomial Negativo apresentam valores positivos para esse parâmetro, a etapa Binomial do modelo ZIP atribui a ele um valor negativo. Embora pareça contraintuitivo, esse resultado é coerente, já que, nesse modelo ZIP, quanto maior o valor de **quality**, menor a probabilidade de a variável resposta ser zerada e, com isso, maior seu valor potencial, indicando uma relação positiva entre essas variáveis, consistente com os demais modelos. Portanto, eles estão de acordo com respeito às direções dessas correlações.
+
+### 3.6.2. Resíduos de Pearson
+
+A seguir, estão dispostos lado a lado os gráficos das distribuições dos resíduos de Pearson de cada modelo para que seja realizada uma comparação entre seus desempenhos.
+
+```{r, echo = FALSE, fig.width=11, fig.height=3, fig.align='center'}
+par(mfrow = c(1, 3))
+
+par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+plot(fitted(model_poisson), residuals(model_poisson, type = "pearson"),
+  main = "Poisson",
+  xlab = "Valor previsto",
+  ylab = "Resíduo",
+  xlim = c(-1, 60),
+  ylim = c(-5, 45),
+  cex.main = 1.3, 
+  cex.lab = 1.2,
+  cex.axis = 1)
+abline(h = 0, col = "red")
+
+par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+plot(fitted(model_nb), residuals(model_nb, type = "pearson"),
+  main = "Binomial Negativo",
+  xlab = "Valor previsto",
+  ylab = "",
+  xlim = c(-1, 60),
+  ylim = c(-5, 45),
+  cex.main = 1.3, 
+  cex.lab = 1.2,
+  cex.axis = 1)
+abline(h = 0, col = "red")
+
+par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+plot(fitted(model_zip), residuals(model_zip, type = "pearson"),
+  main = "ZIP",
+  xlab = "Valor previsto",
+  ylab = "",
+  xlim = c(-1, 60),
+  ylim = c(-5, 45),
+  cex.main = 1.3, 
+  cex.lab = 1.2,
+  cex.axis = 1)
+abline(h = 0, col = "red")
+```
+
+Como pode ser observado, tanto o modelo Poisson quando o ZIP (que também utiliza a distribuição Poisson) estimam valores muito menores que o modelo Binomial Negativo, o que é explicado pela falta de modelagem do fator de sobredispersão por parte desses modelos. Essa subestimação também é confirmada pela grande quantidade de resíduos altamente positivos em ambos os ajustes, que sugere sua falta de capacidade para modelar valores extremos.
+
+Por outro lado, o modelo Binomial Negativo apresenta uma distribuição mais simétrica e próxima do zero, indicando um ajuste mais apropriado aos dados. Isso pode ser justificado pela inclusão de um parâmetro de sobredispersão, que permite a ele absorver de forma mais eficiente a variância gerada pelos registros extremos.
+
+### 3.6.3. AIC
+
+Em seguida, serão comparadas as estatísticas AIC dos três modelos em estudo.
 
 ```{r, echo = FALSE}
-# 1. Obtenha as probabilidades da parte de zero inflado
-p_zero <- predict(model_zip, type = "zprob")         
+aic_poisson <- AIC(model_poisson)
+aic_nb      <- AIC(model_nb)
+aic_zip     <- AIC(model_zip)
 
-# 2. Obtenha os valores esperados da parte Poisson
-mu <- predict(model_zip, type = "conditional")       
+aic_table <- data.frame(
+  Modelo = c("Poisson", "NegBin", "ZIP"),
+  AIC   = c(aic_poisson, aic_nb, aic_zip)
+)
 
-# 3. Calcule a probabilidade total de zero
-p_zero_total <- p_zero + (1 - p_zero) * exp(-mu)
-
-# 4. Simulação
-n_sim <- 1000
-zero_counts <- numeric(n_sim)
-
-for (i in 1:n_sim) {
-  sampled <- rbinom(length(p_zero_total), size = 1, prob = p_zero_total)
-  zero_counts[i] <- sum(sampled)
-}
-
-# 5. Resultados
-mean_predicted_zeros <- mean(zero_counts)
-ci <- quantile(zero_counts, c(0.025, 0.975))
-
-cat("Média total de zeros previstos em", n_sim, "simulações:", mean_predicted_zeros, "\n")
+knitr::kable(aic_table, row.names = FALSE)
 ```
 
+Notavelmente, o modelo Binomial Negativo obteve um desempenho superior que os modelos baseados na distribuição Poisson, devido à incorporação do coeficiente de sobredispersão, que permite a ele separar a média da variância e, assim, modelar de maneira mais adequada os valores extremos.
 
+Enquanto isso, o modelo ZIP apresenta um risco estimado menor que o Poisson tradicional, o que se justifica pela sua capacidade de modelar os zeros estruturais da variável resposta (o que será demonstrado a seguir). Entretanto, ainda não apresenta um ajuste tão apropriado quanto o do modelo Binomial Negativo devido à falta da modelagem da sobredispersão presente nesse último.
 
-# Discussão e Conclusão
+### 3.6.4. Desempenho na modelagem dos valores zero
 
-...
+Por fim, será avaliado como cada um desses modelos desempenha com relação à modelagem e previsão dos valores zero da variável resposta **trips**. Para isso, em cada modelo:
+
+1. Será feito seu ajuste.
+2. Serão geradas amostras de previsões para os dados a partir da distribuição assumida por cada modelo com os parâmetros estimados.
+3. Serão contabilizados os valores zero previstos.
+
+Esse processo será realizado 1000 vezes e a média dos resultados será considerada para garantir uma estimativa estável dessa quantidade. Os resultados estão exibidos a seguir:
+
+```{r, echo = FALSE}
+n_sim = 100
+
+true_zeros = sum(trips == 0)
+
+zero_counts_poisson = numeric(n_sim)
+zero_counts_nb = numeric(n_sim)
+zero_counts_zip = numeric(n_sim)
+
+for (i in 1:n_sim) {
+  
+  # Poisson
+  lambda_pois = predict(model_poisson, type = "response")
+  y_sim_pois = rpois(length(lambda_pois), lambda_pois)
+  zero_counts_poisson[i] <- sum(y_sim_pois == 0)
+  
+  # NegBin
+  mu_nb = predict(model_nb, type = "response")
+  theta_nb = model_nb$theta
+  y_sim_nb = rnbinom(length(mu_nb), size = theta_nb, mu = mu_nb)
+  zero_counts_nb[i] = sum(y_sim_nb == 0)
+  
+  # ZIP
+  mu_zip = predict(model_zip, type = "response")
+  theta_zip = predict(model_zip, type = "zprob")
+  
+  binom_pred_zip = rbinom(length(theta_zip), size = 1, prob = theta_zip)
+  
+  y_sim_zip <- ifelse(binom_pred_zip == 1, 0, rpois(length(mu_zip), mu_zip))
+  zero_counts_zip[i] = sum(y_sim_zip == 0)
+}
+
+mean_zeros = data.frame(
+  Modelo         = c("REAL", "Poisson", "NegBin", "ZIP"),
+  Media_Zeros    = c(true_zeros,
+                     mean(zero_counts_poisson),
+                     mean(zero_counts_nb),
+                     mean(zero_counts_zip))
+)
+
+knitr::kable(mean_zeros, row.names = FALSE, digits = 1)
+```
+
+Analisando a tabela, é possível concluir que, de fato, o modelo Poisson não estava ajustando de forma adequada o excesso de zeros dos dados da variável **trips**, prevendo muito menos valores zero que a quantidade verdadeira. Por outro lado, tanto o modelo Binomial Negativo quanto o modelo ZIP apresentaram desempenho aceitável nesse quesito. Nota-se, então, que a maior elaboração do modelo Poisson ao construir um modelo misto, o ZIP, foi capaz de corrigir a deficiência do modelo clássico com relação à modelagem desses valores. Enquanto isso, a própria inclusão de um coeficiente de sobredispersão já foi suficiente para o modelo Binomial Negativo obter uma boa capacidade de representar os zeros observados.
+
+# 4. Discussão e Conclusão
+
+Portanto, com base nos experimentos e análises conduzidos, pode-se concluir que a presença de sobredispersão na variável resposta a ser modelada pode comprometer significativamente o desempenho de modelos estatísticos quando não levada em consideração. Isso é exemplificado pela aplicação de um modelo Poisson aos dados em estudo, o que gerou resultados insatisfatórios na modelagem tanto de valores extremos quanto de valores zero excessivos.
+
+Ao refinar essa estratégia por meio da adoção de um modelo Poisson inflado de zeros (ZIP), o desempenho relacionado ao excesso de zeros obteve uma melhora significativa, sendo capaz de absorver e modelar os zeros estruturais presentes na base. Entretanto, ele ainda apresentou desempenho insatisfatório na modelagem de valores extremos, resultantes da alta variância dos dados.
+
+Por fim, a inclusão de um coeficiente de sobredispersão por meio da utilização de um modelo Binomial Negativo permitiu que as consequências geradas pela alta variância fossem mitigadas, como mostrado pelos resíduos relativamente pequenos quando comparados aos resíduos dos modelos Poisson e ZIP. Ao mesmo tempo, essa nova característica também forneceu ao modelo a capacidade de modelar os zeros estruturais, proporcionando um desempenho geral superior aos demais modelos, sendo, portanto, preferível dentre os modelos analisados.
+
+No entanto, apesar dos desempenhos variados, todos os modelos estudados apresentaram resultados medianos, não sendo capazes de alcançar um ajuste plenamente satisfatório. Uma possível causa para isso é a falta de dados mais relevantes, dado que o estudo foi limitado aos dados presentes na base da biblioteca AER. Com isso, é provável que a incorporação de novas covariáveis resultasse em modelos melhor ajustados.
+
+Além disso, com o objetivo de obter modelos mais adequados a esses dados, esse trabalho poderia ser expandido por meio da aplicação e da experimentação de novos modelos estatísticos, sejam variantes dos apresentados aqui ou baseados em abordagens distintas. Uma possibilidade seria o modelo Binomial Negativo inflado de zeros (ZINB da sigla em inglês), que agrega a capacidade de absorção da sobredispersão do modelo Binomial Negativo com a boa modelagem dos zeros estruturais fornecida pelo modelo ZIP. Esse e outros modelos poderiam gerar resultados mais robustos que os obtidos pelos estudados nesse projeto.
 
 # Referências
 
-Ros
-Dobson
-Cameron & Trivedi
+[Cameron & Trivedi (1990)] Cameron, A. C., & Trivedi, P. K. (1990). Regression-based tests for overdispersion in the Poisson model. *Journal of Econometrics, 46*(3), 347–364. https://doi.org/10.1016/0304-4076(90)90014-K
+
+[Dobson (2018)] Dobson, A. J., & Barnett, A. G. (2018). *An introduction to generalized linear models* (4th ed.). CRC Press. https://doi.org/10.1201/9781315182780
+
+Gelman, A., Hill, J., & Vehtari, A. (2020). *Regression and other stories*. Cambridge University Press. https://doi.org/10.1017/9781139161879
+
+Stan Development Team. (n.d.). *Finite mixtures*. Stan User’s Guide. https://mc-stan.org/docs/stan-users-guide/finite-mixtures.html

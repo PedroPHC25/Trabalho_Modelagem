@@ -37,46 +37,16 @@
 \makeatother
 \usepackage{xcolor}
 \usepackage[margin=1in]{geometry}
-\usepackage{color}
-\usepackage{fancyvrb}
-\newcommand{\VerbBar}{|}
-\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
-% Add ',fontsize=\small' for more characters per line
-\usepackage{framed}
-\definecolor{shadecolor}{RGB}{248,248,248}
-\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
-\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
-\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\BuiltInTok}[1]{#1}
-\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
-\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
-\newcommand{\ExtensionTok}[1]{#1}
-\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
-\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\ImportTok}[1]{#1}
-\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
-\newcommand{\NormalTok}[1]{#1}
-\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
-\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
-\newcommand{\RegionMarkerTok}[1]{#1}
-\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
-\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
-\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
-\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -150,19 +120,20 @@ seguir:
 \tightlist
 \item
   \textbf{trips}: assume valores naturais (incluindo 0) e representa o
-  número de viagens de barco recreativas;
+  número de viagens de barco recreativas ao lago Somerville em 1980;
 \item
-  \textbf{quality}: assume valores de 1 a 5 e classifica subjetivamente
-  a qualidade da instalação;
+  \textbf{quality}: assume valores de 1 a 5 e representa a classificação
+  fornecida pelo indivíduo sobre a qualidade das instalações do lago;
 \item
   \textbf{ski}: assume valores ``yes'' ou ``no'' e indica se o indivíduo
-  estava praticando esqui aquático no lago;
+  praticava (ou se praticaria, caso nunca tivesse ido) esqui aquático no
+  lago;
 \item
   \textbf{income}: assume valores naturais e representa a renda familiar
   anual do entrevistado (milhares de dólares);
 \item
   \textbf{userfee}: assume valores ``yes'' ou ``no'' e indica se o
-  indivíduo pagou uma taxa anual de uso no Lago Somerville;
+  indivíduo pagou uma taxa anual de uso do Lago Somerville;
 \item
   \textbf{costC}: assume valores positivos e representa as despesas
   estimadas para visitar o Lago Conroe (em dólares);
@@ -478,7 +449,7 @@ qui-quadrado de Pearson:
 X^2 = \sum r_i^2
 \]
 
-citada por Dobson (2001). De acordo com a autora, sob a hipótese de que
+citada por Dobson (2018). De acordo com a autora, sob a hipótese de que
 o modelo está correto, essa estatística teria aproximadamente a
 distribuição \(\chi^2(N-p)\), onde \(N\) é o número de pontos de dados e
 \(p\) é o número de parâmetros do modelo. No entanto, essa aproximação é
@@ -517,7 +488,7 @@ onde \(l(\dot{\beta}; y)\) é a log-verossimilhança do modelo saturado
 (ou seja, com o número máximo de parâmetros que podem ser estimados)
 avaliada em seu EMV.
 
-Segundo Dobson (2001), a distribuição amostral aproximada para \(C\) é
+Segundo Dobson (2018), a distribuição amostral aproximada para \(C\) é
 \(\chi^2(p-1)\) sob a hipótese de que todos os \(p\) parâmetros, exceto
 o termo do intercepto, são zero. Assim, \(C\) é uma estatística de teste
 para a hipótese de que nenhuma das covariáveis é necessária para um
@@ -553,7 +524,7 @@ Binomial Negativo. Ele é calculado da seguinte forma:
 \text{pseudo-R}^2 = \dfrac{l(\tilde{\beta}; y) - l(\hat{\beta}; y)}{l(\tilde{\beta}; y)}
 \]
 
-Segundo Dobson (2001), ele pode representar a melhora proporcional na
+Segundo Dobson (2018), ele pode representar a melhora proporcional na
 função de log-verossimilhança ocasionada pelos termos no modelo de
 interesse, comparada ao modelo minimal. Assim, assume valores entre 0 e
 1, com valores próximos de 0 indicando ajuste ruim e valores próximos de
@@ -895,38 +866,6 @@ desempenho quando comparado com o modelo minimal da mesma família, o que
 indica um resultado razoável, mas que pode ser melhorado com o uso de
 outros modelos, como será apresentado a seguir.
 
-\textbf{Desempenho da modelagem dos valores zero}
-
-Por último, será analisado o desempenho desse modelo na estimação dos
-valores zero do dado. Para isso, será gerada, para cada dado, uma
-previsão para \textbf{trips} por meio de uma amostragem da distribuição
-Poisson com a média sendo a média estimada pelo modelo para esse ponto
-de dado. Em seguida, serão contabilizadas quantas dessas previsões
-receberam o valor 0. Esse processo será realizado 1000 vezes e a média
-dos resultados será considerada, a fim de obter uma estimativa estável.
-
-Abaixo estão os resultados obtidos:
-
-\begin{verbatim}
-## -> Número de 0s:
-\end{verbatim}
-
-\begin{verbatim}
-## No dado:   417
-\end{verbatim}
-
-\begin{verbatim}
-## Previstos: 260.342
-\end{verbatim}
-
-Como observado, o modelo Poisson subestima a ocorrência de zeros em
-comparação à quantidade observada nos dados, o que é confirmado pelo
-gráfico dos resíduos mostrado acima. Nele, há uma grande quantidade de
-resíduos pequenos negativos, sugerindo que o modelo tenha atribuído para
-esses pontos valores pequenos da variável resposta, mas ainda maiores
-que 0. Isso levará, mais adiante, ao ajuste de outros modelos de modo a
-tentar mitigar esse efeito.
-
 \subsection{3.3. Teste para
 sobredispersão}\label{teste-para-sobredispersuxe3o}
 
@@ -1055,7 +994,7 @@ modelo}\label{avaliauxe7uxe3o-do-modelo-1}
 A primeira análise realizada será sobre a distribuição dos resíduos de
 Pearson:
 
-\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-23-1} \end{center}
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-22-1} \end{center}
 
 É notável a concentração dos resíduos em valores próximos de zero, o que
 sugere um bom ajuste. Além disso, nota-se que os poucos resíduos com
@@ -1155,7 +1094,7 @@ ajuste}\label{avaliauxe7uxe3o-do-ajuste}
 
 \textbf{Resíduos de Pearson}
 
-\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-27-1} \end{center}
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-26-1} \end{center}
 
 Nota-se uma concentração dos resíduos mais proeminentes em valores
 positivos, indicando que, assim como o modelo Poisson, o modelo ZIP não
@@ -1203,44 +1142,213 @@ uso de covariáveis explicativas. Assim, ele apresenta uma performance
 considerável, embora ainda permita a exploração de modelos mais
 elaborados ou a inserção de covariáveis adicionais.
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# 1. Obtenha as probabilidades da parte de zero inflado}
-\NormalTok{p\_zero }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(model\_zip, }\AttributeTok{type =} \StringTok{"zprob"}\NormalTok{)         }
+\subsection{3.6. Comparação dos
+modelos}\label{comparauxe7uxe3o-dos-modelos}
 
-\CommentTok{\# 2. Obtenha os valores esperados da parte Poisson}
-\NormalTok{mu }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(model\_zip, }\AttributeTok{type =} \StringTok{"conditional"}\NormalTok{)       }
+Finalmente, nesta seção, será efetuada a comparação dos desempenhos dos
+três modelos ajustados, analisando-se, para esse fim, seus coeficientes
+estimados, as distribuições de seus resíduos de Pearson, suas
+estatísticas AIC (definido e justificado na seção 2.4.4) e seus
+resultados na modelagem dos valores zero.
 
-\CommentTok{\# 3. Calcule a probabilidade total de zero}
-\NormalTok{p\_zero\_total }\OtherTok{\textless{}{-}}\NormalTok{ p\_zero }\SpecialCharTok{+}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ p\_zero) }\SpecialCharTok{*} \FunctionTok{exp}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{mu)}
+\subsubsection{3.6.1. Coeficientes
+estimados}\label{coeficientes-estimados}
 
-\CommentTok{\# 4. Simulação}
-\NormalTok{n\_sim }\OtherTok{\textless{}{-}} \DecValTok{1000}
-\NormalTok{zero\_counts }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(n\_sim)}
+A seguir, apresenta-se uma tabela com os valores estimados por cada
+modelo para os coeficientes de cada covariável utilizada. Vale lembrar
+que a interpretação desses parâmetros varia entre os modelos,
+principalmente no caso do modelo misto ZIP.
 
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\NormalTok{n\_sim) \{}
-\NormalTok{  sampled }\OtherTok{\textless{}{-}} \FunctionTok{rbinom}\NormalTok{(}\FunctionTok{length}\NormalTok{(p\_zero\_total), }\AttributeTok{size =} \DecValTok{1}\NormalTok{, }\AttributeTok{prob =}\NormalTok{ p\_zero\_total)}
-\NormalTok{  zero\_counts[i] }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(sampled)}
-\NormalTok{\}}
+\begin{longtable}[]{@{}lrrrr@{}}
+\toprule\noalign{}
+Termo & Poisson & NegBin & ZIP\_Poisson & ZIP\_Bin \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+(Intercept) & -0.9736011 & -1.8295192 & 1.3847435 & 2.973119 \\
+quality & 0.5589451 & 0.9204542 & NA & -1.618418 \\
+skiyes & 0.5367447 & 0.5256364 & 0.5283603 & NA \\
+income\_c & -0.1675428 & NA & -0.1271612 & NA \\
+costS\_100\_c & -1.6673412 & -1.4048156 & -1.5035012 & NA \\
+\end{longtable}
 
-\CommentTok{\# 5. Resultados}
-\NormalTok{mean\_predicted\_zeros }\OtherTok{\textless{}{-}} \FunctionTok{mean}\NormalTok{(zero\_counts)}
-\NormalTok{ci }\OtherTok{\textless{}{-}} \FunctionTok{quantile}\NormalTok{(zero\_counts, }\FunctionTok{c}\NormalTok{(}\FloatTok{0.025}\NormalTok{, }\FloatTok{0.975}\NormalTok{))}
+Em resumo, todos os modelos apontam direções semelhantes nos efeitos das
+covariáveis utilizadas sobre a variável resposta \textbf{trips}, o que
+pode ser observado pelos sinais dos coeficientes estimados em cada
+modelo. Os únicos casos que não obedecem a esse padrão são os
+interceptos e o coeficiente de \textbf{quality}. Com relação a esse
+último, enquanto os modelos de Poisson e Binomial Negativo apresentam
+valores positivos para esse parâmetro, a etapa Binomial do modelo ZIP
+atribui a ele um valor negativo. Embora pareça contraintuitivo, esse
+resultado é coerente, já que, nesse modelo ZIP, quanto maior o valor de
+\textbf{quality}, menor a probabilidade de a variável resposta ser
+zerada e, com isso, maior seu valor potencial, indicando uma relação
+positiva entre essas variáveis, consistente com os demais modelos.
+Portanto, eles estão de acordo com respeito às direções dessas
+correlações.
 
-\FunctionTok{cat}\NormalTok{(}\StringTok{"Média total de zeros previstos em"}\NormalTok{, n\_sim, }\StringTok{"simulações:"}\NormalTok{, mean\_predicted\_zeros, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
+\subsubsection{3.6.2. Resíduos de
+Pearson}\label{resuxedduos-de-pearson-1}
 
-\begin{verbatim}
-## Média total de zeros previstos em 1000 simulações: 420.386
-\end{verbatim}
+A seguir, estão dispostos lado a lado os gráficos das distribuições dos
+resíduos de Pearson de cada modelo para que seja realizada uma
+comparação entre seus desempenhos.
 
-\section{Discussão e Conclusão}\label{discussuxe3o-e-conclusuxe3o}
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-30-1} \end{center}
 
-\ldots{}
+Como pode ser observado, tanto o modelo Poisson quando o ZIP (que também
+utiliza a distribuição Poisson) estimam valores muito menores que o
+modelo Binomial Negativo, o que é explicado pela falta de modelagem do
+fator de sobredispersão por parte desses modelos. Essa subestimação
+também é confirmada pela grande quantidade de resíduos altamente
+positivos em ambos os ajustes, que sugere sua falta de capacidade para
+modelar valores extremos.
+
+Por outro lado, o modelo Binomial Negativo apresenta uma distribuição
+mais simétrica e próxima do zero, indicando um ajuste mais apropriado
+aos dados. Isso pode ser justificado pela inclusão de um parâmetro de
+sobredispersão, que permite a ele absorver de forma mais eficiente a
+variância gerada pelos registros extremos.
+
+\subsubsection{3.6.3. AIC}\label{aic-1}
+
+Em seguida, serão comparadas as estatísticas AIC dos três modelos em
+estudo.
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule\noalign{}
+Modelo & AIC \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Poisson & 3598.955 \\
+NegBin & 1817.111 \\
+ZIP & 2631.776 \\
+\end{longtable}
+
+Notavelmente, o modelo Binomial Negativo obteve um desempenho superior
+que os modelos baseados na distribuição Poisson, devido à incorporação
+do coeficiente de sobredispersão, que permite a ele separar a média da
+variância e, assim, modelar de maneira mais adequada os valores
+extremos.
+
+Enquanto isso, o modelo ZIP apresenta um risco estimado menor que o
+Poisson tradicional, o que se justifica pela sua capacidade de modelar
+os zeros estruturais da variável resposta (o que será demonstrado a
+seguir). Entretanto, ainda não apresenta um ajuste tão apropriado quanto
+o do modelo Binomial Negativo devido à falta da modelagem da
+sobredispersão presente nesse último.
+
+\subsubsection{3.6.4. Desempenho na modelagem dos valores
+zero}\label{desempenho-na-modelagem-dos-valores-zero}
+
+Por fim, será avaliado como cada um desses modelos desempenha com
+relação à modelagem e previsão dos valores zero da variável resposta
+\textbf{trips}. Para isso, em cada modelo:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Será feito seu ajuste.
+\item
+  Serão geradas amostras de previsões para os dados a partir da
+  distribuição assumida por cada modelo com os parâmetros estimados.
+\item
+  Serão contabilizados os valores zero previstos.
+\end{enumerate}
+
+Esse processo será realizado 1000 vezes e a média dos resultados será
+considerada para garantir uma estimativa estável dessa quantidade. Os
+resultados estão exibidos a seguir:
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule\noalign{}
+Modelo & Media\_Zeros \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+REAL & 417.0 \\
+Poisson & 259.8 \\
+NegBin & 423.5 \\
+ZIP & 438.1 \\
+\end{longtable}
+
+Analisando a tabela, é possível concluir que, de fato, o modelo Poisson
+não estava ajustando de forma adequada o excesso de zeros dos dados da
+variável \textbf{trips}, prevendo muito menos valores zero que a
+quantidade verdadeira. Por outro lado, tanto o modelo Binomial Negativo
+quanto o modelo ZIP apresentaram desempenho aceitável nesse quesito.
+Nota-se, então, que a maior elaboração do modelo Poisson ao construir um
+modelo misto, o ZIP, foi capaz de corrigir a deficiência do modelo
+clássico com relação à modelagem desses valores. Enquanto isso, a
+própria inclusão de um coeficiente de sobredispersão já foi suficiente
+para o modelo Binomial Negativo obter uma boa capacidade de representar
+os zeros observados.
+
+\section{4. Discussão e Conclusão}\label{discussuxe3o-e-conclusuxe3o}
+
+Portanto, com base nos experimentos e análises conduzidos, pode-se
+concluir que a presença de sobredispersão na variável resposta a ser
+modelada pode comprometer significativamente o desempenho de modelos
+estatísticos quando não levada em consideração. Isso é exemplificado
+pela aplicação de um modelo Poisson aos dados em estudo, o que gerou
+resultados insatisfatórios na modelagem tanto de valores extremos quanto
+de valores zero excessivos.
+
+Ao refinar essa estratégia por meio da adoção de um modelo Poisson
+inflado de zeros (ZIP), o desempenho relacionado ao excesso de zeros
+obteve uma melhora significativa, sendo capaz de absorver e modelar os
+zeros estruturais presentes na base. Entretanto, ele ainda apresentou
+desempenho insatisfatório na modelagem de valores extremos, resultantes
+da alta variância dos dados.
+
+Por fim, a inclusão de um coeficiente de sobredispersão por meio da
+utilização de um modelo Binomial Negativo permitiu que as consequências
+geradas pela alta variância fossem mitigadas, como mostrado pelos
+resíduos relativamente menores quando comparados aos resíduos dos
+modelos Poisson e ZIP. Ao mesmo tempo, essa nova característica também
+forneceu ao modelo a capacidade de modelar os zeros estruturais,
+proporcionando um desempenho geral superior aos demais modelos.
+
+No entanto, apesar dos desempenhos variados, todos os modelos estudados
+apresentaram resultados medianos, não sendo capazes de alcançar um
+ajuste plenamente satisfatório. Uma possível causa para isso é a falta
+de dados mais relevantes, dado que o estudo foi limitado aos dados
+presentes na base da biblioteca AER. Com isso, é provável que a
+incorporação de novas covariáveis resultasse em modelos melhor
+ajustados.
+
+Além disso, com o objetivo de obter modelos mais adequados a esses
+dados, esse trabalho poderia ser expandido por meio da aplicação e da
+experimentação de novos modelos estatísticos, sejam variantes dos
+apresentados aqui ou baseados em abordagens distintas. Uma possibilidade
+seria o modelo Binomial Negativo inflado de zeros (ZINB da sigla em
+inglês), que agrega a capacidade de absorção da sobredispersão do modelo
+Binomial Negativo com a boa modelagem dos zeros estruturais fornecida
+pelo modelo ZIP. Esse e outros modelos poderiam gerar resultados mais
+robustos que os obtidos pelos estudados nesse projeto.
 
 \section{Referências}\label{referuxeancias}
 
-Ros Dobson Cameron \& Trivedi
+{[}Cameron \& Trivedi (1990){]} Cameron, A. C., \& Trivedi, P. K.
+(1990). Regression-based tests for overdis- \(\hspace{1.5em}\) persion
+in the Poisson model. \emph{Journal of Econometrics, 46}(3), 347--364.
+\url{https://doi.org/10.1016/0304-4076(90)90014-K}
+
+{[}Dobson (2018){]} Dobson, A. J., \& Barnett, A. G. (2018). \emph{An
+introduction to generalized linear models} (4th ed.). CRC Press.
+\url{https://doi.org/10.1201/9781315182780}
+
+Gelman, A., Hill, J., \& Vehtari, A. (2020). \emph{Regression and other
+stories}. Cambridge University Press.
+\url{https://doi.org/10.1017/9781139161879}
+
+Stan Development Team. (n.d.). \emph{Finite mixtures}. Stan User's
+Guide.
+\url{https://mc-stan.org/docs/stan-users-guide/finite-mixtures.html}
 
 \end{document}
