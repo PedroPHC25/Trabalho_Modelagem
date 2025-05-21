@@ -277,13 +277,14 @@ No entanto, vale destacar que essa estatística não é adequada para a compara�
 
 ## 2.5. Ferramentas
 
-Para a realização de todas as análises, ajustes de modelos e gerações de visualizações, foi utilizado o software estatístico R. A biblioteca **AER**[^5] foi utilizada para a obtenção dos dados, e a **ggplot2**[^6] e a **GGally**[^7], para a geração dos gráficos. Além disso, foi utilizado um método da biblioteca **MASS**[^8] para o ajuste do modelo Binomial Negativo e um da biblioteca **glmmTMB**[^9] para o ajuste do modelo de inflação de zeros.
+Para a realização de todas as análises, ajustes de modelos e gerações de visualizações, foi utilizado o software estatístico R. A biblioteca **AER**[^5] foi utilizada para a obtenção dos dados, e a **ggplot2**[^6] e a **GGally**[^7], para a geração dos gráficos. Além disso, foi utilizado um método da biblioteca **MASS**[^8] para o ajuste do modelo Binomial Negativo e um da biblioteca **glmmTMB**[^9] para o ajuste do modelo de inflação de zeros. Por fim, a biblioteca **modelsummary**[^10] foi aplicada na geração de algumas das tabelas presentes nesse projeto.
 
 [^5]: https://rdrr.io/cran/AER/
 [^6]: https://ggplot2.tidyverse.org
 [^7]: https://cran.r-project.org/web/packages/GGally/index.html
 [^8]: https://cran.r-project.org/web/packages/MASS/index.html
 [^9]: https://cran.r-project.org/web/packages/glmmTMB/index.html
+[^10]: https://cran.r-project.org/web/packages/modelsummary/index.html
 
 # 3. Resultados
 
@@ -858,7 +859,7 @@ Além disso, esse valor é menor que o obtido pelo modelo Poisson, mas, como exp
 
 ## 3.5. Ajuste do modelo Poisson inflado de zeros
 
-Para o ajuste do modelo Poisson inflado de zeros, foram escolhidas, com base em alguns testes, a covariável **quality** para a modelagem da etapa logística e as demais para a modelagem da etapa de contagem. Assim, feito o ajuste, o resultado obtido foi o seguinte:
+Para o ajuste do modelo Poisson inflado de zeros, foram escolhidas, com base em testes preliminares, a covariável **quality** para a modelagem da etapa logística e as demais para a modelagem da etapa de contagem. Assim, feito o ajuste, o resultado obtido foi o seguinte:
 
 ```{r, echo = FALSE}
 if(!require(glmmTMB)) install.packages("glmmTMB")
@@ -872,7 +873,7 @@ model_zip = glmmTMB(trips ~ ski + income_c + costS_100_c,
 summary(model_zip)
 ```
 
-Dada a seleção prévia realizada, todos os coeficientes mostram-se relevantes.
+Dada a seleção de covariáveis realizada, todos os coeficientes mostram-se estatisticamente significativos.
 
 A seguir, esse modelo será avaliado segundo as mesmas métricas aplicadas sobre os modelos anteriores.
 
@@ -897,9 +898,77 @@ Nota-se uma concentração dos resíduos mais proeminentes em valores positivos,
 
 **Estatística qui-quadrado de razão de verossimilhança**
 
+Aqui, será considerado como modelo nulo a versão do modelo ZIP sem o uso de covariáveis, ou seja, ainda será mantida sua estrutura mista, mas tanto a etapa Binomial quanto a etapa Poisson serão regredidas apenas sobre interceptos.
 
+```{r, echo = FALSE}
+min_model_zip = glmmTMB(trips ~ 1,
+                    ziformula = ~ 1,
+                    family = poisson,
+                    data = RecreationDemand)
 
-```{r}
+C_zip = deviance(min_model_zip) - deviance(model_zip)
+
+cat("Estatística C:", C_zip, "\n")
+
+df_model_zip = nobs(model_zip) - attr(logLik(model_zip), "df")
+df_min_model_zip = nobs(min_model_zip) - attr(logLik(min_model_zip), "df")
+
+df_zip = df_min_model_zip - df_model_zip
+
+cat("Graus de liberdade:", df_zip, "\n")
+
+pvalue_zip = pchisq(C_zip, df_zip, lower.tail = FALSE)
+
+cat("p-valor:", pvalue_zip)
+```
+
+Novamente, conclui-se que os coeficientes referentes às covariáveis utilizadas provavelmente são estatisticamente significativos.
+
+**Pseudo-$\text{R}^2$**
+
+Por fim, a seguir está o valor calculado para o pseudo-$\text{R}^2$ desse modelo:
+
+```{r, echo = FALSE}
+loglik_zip = logLik(model_zip)
+loglik_min_zip = logLik(min_model_zip)
+
+pseudo_R2_zip = (loglik_min_zip - loglik_zip)/loglik_min_zip
+
+cat("Pseudo-R2:", pseudo_R2_zip)
+```
+
+Portanto, esse modelo apresenta uma melhoria de aproximadamente $25\%$ na verossimilhança em comparação com o modelo minimal, ajustado sem o uso de covariáveis explicativas. Assim, ele apresenta uma performance considerável, embora ainda permita a exploração de modelos mais elaborados ou a inserção de covariáveis adicionais.
+
+## 3.6. Comparação dos modelos
+
+Finalmente, nesta seção, será efetuada a comparação dos desempenhos dos 3 modelos ajustados, sendo analisados, para esse fim, seus coeficientes ajustados, suas distribuições de resíduos de Pearson, suas estatísticas AIC (definido e justificado na seção 2.4.4) e seus resultados na modelagem dos valores zero.
+
+### 3.6.1. Significância dos coeficientes
+
+A seguir, temos uma tabela com os valores estimados por cada modelo para os coeficientes de cada covariável utilizada. Vale lembrar que a interpretação desses parâmetros pode diferir entre os modelos, principalmente para o modelo misto ZIP.
+
+```{r, echo = FALSE}
+library(broom)
+library(dplyr)
+library(tidyr)
+library(purrr)
+
+models <- list(
+  Poisson = model_poisson,
+  NegBin  = model_nb,
+  ZIP     = model_zip
+)
+
+coefs <- map_df(models, tidy, .id = "Model")
+
+coefs_wide <- coefs %>%
+  select(Model, term, estimate) %>%
+  pivot_wider(names_from = Model, values_from = estimate)
+
+print(coefs_wide)
+```
+
+```{r, echo = FALSE}
 # 1. Obtenha as probabilidades da parte de zero inflado
 p_zero <- predict(model_zip, type = "zprob")         
 

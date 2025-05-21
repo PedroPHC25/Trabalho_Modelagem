@@ -916,7 +916,7 @@ Abaixo estão os resultados obtidos:
 \end{verbatim}
 
 \begin{verbatim}
-## Previstos: 260.458
+## Previstos: 260.342
 \end{verbatim}
 
 Como observado, o modelo Poisson subestima a ocorrência de zeros em
@@ -1113,9 +1113,9 @@ virem de modelos de famílias diferentes.
 zeros}\label{ajuste-do-modelo-poisson-inflado-de-zeros}
 
 Para o ajuste do modelo Poisson inflado de zeros, foram escolhidas, com
-base em alguns testes, a covariável \textbf{quality} para a modelagem da
-etapa logística e as demais para a modelagem da etapa de contagem.
-Assim, feito o ajuste, o resultado obtido foi o seguinte:
+base em testes preliminares, a covariável \textbf{quality} para a
+modelagem da etapa logística e as demais para a modelagem da etapa de
+contagem. Assim, feito o ajuste, o resultado obtido foi o seguinte:
 
 \begin{verbatim}
 ##  Family: poisson  ( log )
@@ -1144,8 +1144,8 @@ Assim, feito o ajuste, o resultado obtido foi o seguinte:
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
 
-Dada a seleção prévia realizada, todos os coeficientes mostram-se
-relevantes.
+Dada a seleção de covariáveis realizada, todos os coeficientes
+mostram-se estatisticamente significativos.
 
 A seguir, esse modelo será avaliado segundo as mesmas métricas aplicadas
 sobre os modelos anteriores.
@@ -1167,6 +1167,41 @@ próxima seção, será verificado se ele conseguiu mitigar o problema do
 excesso de zeros.
 
 \textbf{Estatística qui-quadrado de razão de verossimilhança}
+
+Aqui, será considerado como modelo nulo a versão do modelo ZIP sem o uso
+de covariáveis, ou seja, ainda será mantida sua estrutura mista, mas
+tanto a etapa Binomial quanto a etapa Poisson serão regredidas apenas
+sobre interceptos.
+
+\begin{verbatim}
+## Estatística C: 2500.429
+\end{verbatim}
+
+\begin{verbatim}
+## Graus de liberdade: 4
+\end{verbatim}
+
+\begin{verbatim}
+## p-valor: 0
+\end{verbatim}
+
+Novamente, conclui-se que os coeficientes referentes às covariáveis
+utilizadas provavelmente são estatisticamente significativos.
+
+\textbf{Pseudo-\(\text{R}^2\)}
+
+Por fim, a seguir está o valor calculado para o pseudo-\(\text{R}^2\)
+desse modelo:
+
+\begin{verbatim}
+## Pseudo-R2: 0.252546
+\end{verbatim}
+
+Portanto, esse modelo apresenta uma melhoria de aproximadamente \(25\%\)
+na verossimilhança em comparação com o modelo minimal, ajustado sem o
+uso de covariáveis explicativas. Assim, ele apresenta uma performance
+considerável, embora ainda permita a exploração de modelos mais
+elaborados ou a inserção de covariáveis adicionais.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1197,7 +1232,7 @@ excesso de zeros.
 \end{Shaded}
 
 \begin{verbatim}
-## Média total de zeros previstos em 1000 simulações: 420.449
+## Média total de zeros previstos em 1000 simulações: 420.386
 \end{verbatim}
 
 \section{Discussão e Conclusão}\label{discussuxe3o-e-conclusuxe3o}
