@@ -1230,7 +1230,7 @@ Por fim, será avaliado como cada um desses modelos desempenha com relação à 
 Esse processo será realizado 1000 vezes e a média dos resultados será considerada para garantir uma estimativa estável dessa quantidade. Os resultados estão exibidos a seguir:
 
 ```{r, echo = FALSE, results = 'asis'}
-n_sim = 100
+n_sim = 1000
 
 true_zeros = sum(trips == 0)
 
