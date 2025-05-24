@@ -2,11 +2,22 @@
 output:
   pdf_document:
     latex_engine: xelatex
+    number_sections: true
+    toc: false
+documentclass: article
+classoption: twocolumn
 header-includes:
+  - \usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
   - \usepackage{setspace}
+  - \usepackage{multicol}
+  - \usepackage[brazilian]{babel}
+  - \setlength{\columnsep}{0.75cm}
 ---
 
 ```{=latex}
+\twocolumn[
+\begin{@twocolumnfalse}
+
 \begin{center}
 {\LARGE \textbf{Sobredispersão em Modelos de Contagem}\\
 Modelagem Estatística \par}
@@ -16,28 +27,30 @@ Modelagem Estatística \par}
 
 {\large \today \par}
 \end{center}
+
+\vspace{1cm}
+\end{@twocolumnfalse}
+]
 ```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 options(tinytex.verbose = TRUE)
+options(knitr.kable.NA = '', knitr.kable.format = 'latex')
 
 getOption("encoding")
-# ou defina:
 options(encoding = "UTF-8")
 Sys.setlocale("LC_ALL", "Portuguese")
 ```
 
-# 1. Introdução
+# Introdução
 
-O presente trabalho tem como objetivo investigar a sobredispersão em dados de contagem e seus efeitos no ajuste de modelos lineares generalizados (GLMs). Serão considerados modelos de regressão Poisson, Binomial Negativo e Poisson inflado de zeros, aplicados a dados de turismo da região do Texas, nos Estados Unidos. Busca-se avaliar como a sobredispersão afeta o desempenho desses modelos, bem como discutir estratégias para reduzir seus impactos e melhorar a qualidade dos ajustes.
+O presente trabalho tem como objetivo investigar a sobredispersão em dados de contagem e seus efeitos no ajuste de modelos estatísticos, como modelos lineares generalizados (GLMs). Serão considerados modelos de regressão Poisson, Binomial Negativo e Poisson inflado de zeros, aplicados a dados de turismo da região do Texas, nos Estados Unidos. Busca-se avaliar como a sobredispersão afeta o desempenho desses modelos, bem como discutir estratégias para reduzir seus impactos e melhorar a qualidade dos ajustes.
 
-# 2. Métodos
+## Os dados
 
-## 2.1. Os dados
-
-Os dados utilizados para este estudo foram retirados da biblioteca Applied Econometrics with R (AER)[^1]. Será utilizada a base RecreationalDemand[^2], que contém dados sobre o número de viagens de barco recreativas ao Lago Somerville, no Texas, em 1980, com base em uma pesquisa administrada a 2000 proprietários de barcos de lazer registrados em 23 condados do leste do estado.
+Os dados utilizados para este estudo foram retirados da biblioteca Applied Econometrics with R (AER)[^1]. Será utilizada a base RecreationDemand[^2], que contém dados sobre o número de viagens de barco recreativas ao Lago Somerville, no Texas, em 1980, com base em uma pesquisa administrada a 2000 proprietários de barcos de lazer registrados em 23 condados do leste do estado.
 
 [^1]: https://rdrr.io/cran/AER/
 [^2]: https://rdrr.io/cran/AER/man/RecreationDemand.html
@@ -47,7 +60,7 @@ Estão presentes 659 observações com 8 variáveis, que estão descritas a segu
 -   **trips**: assume valores naturais (incluindo 0) e representa o número de viagens de barco recreativas ao lago Somerville em 1980;
 -   **quality**: assume valores de 1 a 5 e representa a classificação fornecida pelo indivíduo sobre a qualidade das instalações do lago;
 -   **ski**: assume valores "yes" ou "no" e indica se o indivíduo praticava (ou se praticaria, caso nunca tivesse ido) esqui aquático no lago;
--   **income**: assume valores naturais e representa a renda familiar anual do entrevistado (milhares de dólares);
+-   **income**: assume valores naturais e representa a renda familiar anual do entrevistado (em milhares de dólares);
 -   **userfee**: assume valores "yes" ou "no" e indica se o indivíduo pagou uma taxa anual de uso do Lago Somerville;
 -   **costC**: assume valores positivos e representa as despesas estimadas para visitar o Lago Conroe (em dólares);
 -   **costS**: assume valores positivos e representa as despesas estimadas para visitar o Lago Somerville (em dólares);
@@ -55,15 +68,17 @@ Estão presentes 659 observações com 8 variáveis, que estão descritas a segu
 
 Uma limitação apresentada por esses dados diz respeito à variável **quality**: apesar de possuir uma escala de 1 a 5, ela recebe o valor 0 para indivíduos que não haviam visitado o lago Somerville, que, como veremos mais adiante, compõem a maioria dos registros.
 
-## 2.2. Os modelos
+# Métodos
+
+## Os modelos
 
 No presente trabalho, o objetivo no que se refere à modelagem será regredir a variável de contagem **trips** sobre outras das variáveis descritas anteriormente. A seleção dessas variáveis será realizada por meio de uma análise exploratória de cada uma delas, em que serão exploradas tanto suas distribuições univariadas quanto suas relações com a variável resposta.
 
-Serão considerados nesse estudo 3 modelos estatísticos da família dos modelos lineares generalizados (GLMs), descritos a seguir.
+Serão considerados nesse estudo 3 modelos estatísticos, descritos a seguir.
 
-### 2.2.1. Modelo Poisson
+### Modelo Poisson
 
-Frequentemente utilizada para modelar dados de contagem, a regressão de Poisson possui a seguinte forma:
+Frequentemente utilizada para modelar dados de contagem, a regressão Poisson possui a seguinte forma:
 
 $$
 \begin{array}{c}
@@ -72,7 +87,7 @@ Y_i \sim \text{Poisson}(\theta_i) \\
 \end{array}
 $$
 
-onde $Y_i$ é a variável resposta (no nosso caso, **trips**) e $X_i$ é o vetor das covariáveis de interesse, ambos indexados pelo i-ésimo registro. Aqui, a função de ligação utilizada é a canônica para a família Poisson: $g(\mu_i) = \log({X_i}^T\beta)$.
+onde $Y_i$ é a variável resposta (nesse caso, **trips**) e $X_i$ é o vetor das covariáveis de interesse, ambos indexados pelo i-ésimo registro. Aqui, a função de ligação utilizada é a canônica para a família Poisson: $g(\mu_i) = \log({X_i}^T\beta)$.
 
 Para o processo de estimação do vetor de parâmetros $\beta$, será utilizado o método de máxima verossimilhança (MV). Algumas das razões para tal escolha são:
 
@@ -100,7 +115,7 @@ onde $l(\beta)$ é a função de log-verossimilhança, $\nabla l(\beta)$ é o gr
 
 -   Se a função de ligação utilizada for a canônica, derivada da distribuição da família exponencial, então os métodos são equivalentes, coincidindo assintoticamente. No entanto, o Fisher Scoring geralmente funciona de forma mais robusta e é mais eficiente computacionalmente, como citado no item anterior.
 
-### 2.2.2. Modelo Binomial Negativo
+### Modelo Binomial Negativo
 
 Utilizado principalmente como um substituto do modelo Poisson, o modelo Binomial Negativo possui a seguinte forma:
 
@@ -140,7 +155,7 @@ Além disso, será novamente aplicado o método de otimização por Fisher Scori
 
 Esse processo é repetido até os parâmetros convergirem.
 
-### 2.2.3. Modelo Poisson inflado de zeros
+### Modelo Poisson inflado de zeros
 
 O modelo Poisson inflado de zeros (ZIP da sigla em inglês) é uma adaptação do modelo Poisson para cenários com excesso de zeros na variável resposta. É um modelo misto definido da seguinte forma[^4]:
 
@@ -169,7 +184,7 @@ $$
 
 Para estimar os coeficientes $\beta$ e $\gamma$, será aplicada a estratégia de máxima verossimilhança, utilizando as mesmas justificativas dos modelos anteriores. Além disso, para realizar a aproximação numérica, serão utilizados métodos numéricos que não serão discutidos aqui, dada sua complexidade. O método de Fisher Scoring não pode ser aplicado diretamente devido à estrutura mista do problema.
 
-## 2.3. Teste de sobredispersão sob modelo Poisson
+## Teste de sobredispersão sob modelo Poisson
 
 Após o ajuste do modelo Poisson aos dados de interesse, será realizado um teste estatístico para identificar a possibilidade de existência de sobredispersão nos dados, ou seja, para verificar se sua variância difere de sua média.
 
@@ -179,7 +194,7 @@ $$
 Var(Y_i) = \mu_i + \alpha \mu_i^2
 $$
 
-Assim, a hipótese nula diz que $\alpha = 0$ e, portanto, o modelo de Poisson é adequado. Por outro lado, a hipótese alternativa afirma que $\alpha > 0$, tornando esse modelo inadequado.
+Assim, a hipótese nula diz que $\alpha = 0$ e que, portanto, o modelo de Poisson é adequado. Por outro lado, a hipótese alternativa afirma que $\alpha > 0$, tornando esse modelo inadequado.
 
 Primeiramente, deve-se ajustar um modelo de Poisson aos dados. Em seguida, é calculada a seguinte estatística de teste:
 
@@ -190,16 +205,18 @@ $$
 onde $\hat{\mu_i}$ é o valor estimado para a média da i-ésima observação obtido pelo modelo de Poisson ajustado. Essa estatística mede a diferença entre a variância observada e a variância esperada sob a hipótese nula. Nota-se que, sob essa hipótese:
 
 $$
-\mathbb{E}[Z_i] = \dfrac{\mathbb{E}[(Y_i - \hat{\mu_i})^2] - \mathbb{E}[Y_i]}{\hat{\mu_i}} = \dfrac{Var(Y_i) - \hat{\mu_i}}{\hat{\mu_i}} = \dfrac{\hat{\mu_i} - \hat{\mu_i}}{\hat{\mu_i}} = 0
+\begin{aligned}
+\mathbb{E}[Z_i] &= \dfrac{\mathbb{E}[(Y_i - \hat{\mu_i})^2] - \mathbb{E}[Y_i]}{\hat{\mu_i}} = \dfrac{Var(Y_i) - \hat{\mu_i}}{\hat{\mu_i}} = \\ &= \dfrac{\hat{\mu_i} - \hat{\mu_i}}{\hat{\mu_i}} = 0
+\end{aligned}
 $$
 
 Com base nisso, a etapa final desse teste consiste em ajustar uma regressão linear sem intercepto de $Z$ sobre $\hat{\mu}$, de forma que $\mathbb{E}[Z_i] = \beta \hat{\mu_i}$. Assim, caso o modelo Poisson seja adequado, a expectativa é que $\beta$ seja próximo de $0$. Em outras palavras, $\beta$ aproxima o parâmetro $\alpha$ da parametrização da variância descrita acima. Portanto, caso $\beta$ seja estatisticamente significativo e positivo, há forte evidência da presença de sobredispersão.
 
-## 2.4. Critérios de avaliação
+## Critérios de avaliação
 
 A seguir, estão descritos os principais critérios utilizados para a avaliação do desempenho dos modelos ajustados.
 
-### 2.4.1. Intervalo de confiança aproximado dos parâmetros
+### Intervalo de confiança aproximado dos parâmetros
 
 Para a avaliação da significância dos parâmetros do ajuste, será utilizada a seguinte aproximação assintótica:
 
@@ -211,7 +228,7 @@ onde $se(\hat{\beta_j}) \approx \sqrt{[\mathbb{I}(\hat{\beta})^{-1}]_{jj}}$.
 
 Assim, é possível calcular um intervalo de confiança aproximado para cada parâmetro e verificar se ele contém o valor 0. Caso não contenha, é altamente provável que ele seja estatisticamente significativo.
 
-### 2.4.2. Resíduos de Pearson
+### Resíduos de Pearson
 
 Os resíduos de Pearson são uma forma de quantificar a distância entre os valores observados e os valores preditos por um modelo. O resíduo para o i-ésimo ponto de dado é calculado da seguinte forma:
 
@@ -229,7 +246,7 @@ $$
 
 citada por Dobson (2018). De acordo com a autora, sob a hipótese de que o modelo está correto, essa estatística teria aproximadamente a distribuição $\chi^2(N-p)$, onde $N$ é o número de pontos de dados e $p$ é o número de parâmetros do modelo. No entanto, essa aproximação é pobre se as frequências esperadas são muito pequenas, que é o caso desse problema, como será mostrado mais adiante. Portanto, a utilização dessa estatística não é viável.
 
-### 2.4.3. Estatística qui-quadrado de razão de verossimilhança
+### Estatística qui-quadrado de razão de verossimilhança
 
 Seja $l(\hat{\beta}; y)$ a log-verossimilhança do modelo de interesse avaliada no estimador de máxima verossimilhança (EMV) e $l(\tilde{\beta}; y)$ a log-verossimilhança do modelo minimal (ou seja, ajustado apenas com o intercepto) também avaliada em seu EMV. Assim, a estatística qui-quadrado de razão de verossimilhança (C) pode ser calculada como:
 
@@ -253,7 +270,7 @@ onde $l(\dot{\beta}; y)$ é a log-verossimilhança do modelo saturado (ou seja, 
 
 Segundo Dobson (2018), a distribuição amostral aproximada para $C$ é $\chi^2(p-1)$ sob a hipótese de que todos os $p$ parâmetros, exceto o termo do intercepto, são zero. Assim, $C$ é uma estatística de teste para a hipótese de que nenhuma das covariáveis é necessária para um modelo parcimonioso. Dessa forma, se o valor de $C$ for estatisticamente significativo comparado com essa distribuição qui-quadrado, então é altamente provável que as covariáveis utilizadas sejam relevantes.
 
-### 2.4.4. AIC
+### AIC
 
 O Akaike Information Criterion (AIC) é uma medida utilizada para avaliar e comparar modelos ajustados a um conjunto de dados. Ele pode ser interpretado como uma estimativa do risco preditivo de um modelo, ou seja, do erro esperado ao utilizá-lo para prever novos dados. Assim, teoricamente, quanto menor seu valor, melhor o modelo.
 
@@ -265,7 +282,7 @@ $$
 
 com os mesmos significados já definidos anteriormente.
 
-### 2.4.5. Pseudo-$\text{R}^2$
+### Pseudo-$\text{R}^2$
 
 O pseudo-$\text{R}^2$ é um análogo do $\text{R}^2$ da regressão linear múltipla para outros modelos, como regressão logística, Poisson e Binomial Negativo. Ele é calculado da seguinte forma:
 
@@ -277,7 +294,7 @@ Segundo Dobson (2018), ele pode representar a melhora proporcional na função d
 
 No entanto, vale destacar que essa estatística não é adequada para a comparação de modelos de famílias diferentes, dado que as funções de log-verossimilhança podem possuir escalas distintas. Assim, ela será utilizada apenas para a avaliação interna de modelos.
 
-## 2.5. Ferramentas
+## Ferramentas
 
 Para a realização de todas as análises, ajustes de modelos e gerações de visualizações, foi utilizado o software estatístico R. A biblioteca **AER**[^5] foi utilizada para a obtenção dos dados, e a **ggplot2**[^6] e a **GGally**[^7], para a geração dos gráficos. Além disso, foi utilizado um método da biblioteca **MASS**[^8] para o ajuste do modelo Binomial Negativo e um da biblioteca **glmmTMB**[^9] para o ajuste do modelo de inflação de zeros.
 
@@ -287,15 +304,15 @@ Para a realização de todas as análises, ajustes de modelos e gerações de vi
 [^8]: https://cran.r-project.org/web/packages/MASS/index.html
 [^9]: https://cran.r-project.org/web/packages/glmmTMB/index.html
 
-# 3. Resultados
+# Resultados
 
-A seguir, serão exibidos e analisados os resultados obtidos a partir da análise exploratória dos dados, seguidos dos ajustes e interpretações dos modelos de interesse, além da aplicação do teste de sobredispersão descrito na seção 2.3.
+A seguir, serão exibidos e analisados os resultados obtidos a partir da análise exploratória dos dados, seguidos dos ajustes e interpretações dos modelos de interesse, além da aplicação do teste de sobredispersão descrito na seção 2.2.
 
-## 3.1. Análise exploratória e seleção de covariáveis
+## Análise exploratória e seleção de covariáveis
 
 Inicialmente, será apresentada uma análise a respeito da variável de interesse a ser modelada, **trips**. Em seguida, as demais covariáveis da base em estudo serão analisadas com o objetivo de selecionar previamente variáveis potencialmente mais adequadas para o ajuste dos modelos.
 
-### 3.1.1. Variável resposta *trips*
+### Variável resposta *trips*
 
 ```{r, echo=FALSE}
 if(!require(AER)) install.packages("AER")
@@ -318,18 +335,19 @@ costH = RecreationDemand$costH
 
 Abaixo está a distribuição dessa variável:
 
-```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+```{r, echo = FALSE, fig.width=4.2, fig.height=3.2, fig.align='center'}
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 hist(
   trips,
-  breaks = 100,
+  breaks = 50,
   xlim = c(0, 100),
-  main = "Distribuição do número de viagens ao lago Somerville",
+  main = "Distribuição do número de\nviagens ao lago Somerville",
   xlab = "Número de viagens",
   ylab = "Frequência",
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6)
+  cex.main = 0.9, 
+  cex.lab = 0.8,
+  cex.axis = 0.7,
+  las = 1)
 ```
 
 É fácil notar a forte presença de dados com valor $0$, indicando a realização de nenhuma viagem recreativa de barco ao lago Somerville em 1980. Isso impacta diretamente nos valores da média e da variância desses dados, como mostrado a seguir:
@@ -341,88 +359,91 @@ cat("Variância:", var(trips), "\n")
 
 A variância é consideravelmente maior que a média, o que é causado justamente pelo excesso de zeros nessa variável, que reduz a média e aumenta o efeito na variância dos valores não nulos. Assim, há um forte indício de sobredispersão que possivelmente afetará o desempenho do modelo Poisson, como será discutido nas próximas seções.
 
-### 3.1.2. Covariável *quality*
+### Covariável *quality*
 
 Abaixo está a distribuição dessa variável:
 
-```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+```{r, echo = FALSE, fig.width=5, fig.height=4, fig.align='center'}
+par(mgp = c(2.1, 0.6, 0), mar = c(3, 4, 2, 2))
 barplot(
   table(quality),
   ylim = c(0, 400),
   main = "Distribuição da qualidade da instalação",
   xlab = "Qualidade",
   ylab = "Frequência",
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6,
-  cex.names = 0.75)
+  cex.main = 1, 
+  cex.lab = 0.9,
+  cex.axis = 0.8,
+  cex.names = 0.75,
+  las = 1)
 ```
 
 Mais uma vez, há um grande número de valores iguais a zero. No entanto, a razão é diferente da fornecida para a variável **trips**: segundo a documentação dos dados, esses valores correspondem a indivíduos que não haviam visitado o lago e que, com isso, não avaliaram a qualidade de suas instalações. Portanto, são equivalentes a valores desconhecidos.
 
-A seguir, é apresentada a distribuição dos valores de **trips** em função da covariável **quality**, sendo plotados todos os pontos à esquerda (com jitter para facilitar a visualização) e apenas as médias dentro de cada valor de **quality** à direita.
+A seguir, é apresentada a distribuição dos valores de **trips** em função da covariável **quality**, sendo plotados todos os pontos acima (com jitter para facilitar a visualização) e apenas as médias dentro de cada valor de **quality** abaixo.
 
-```{r, echo = FALSE, fig.width=7, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
-par(mfrow = c(1, 2))
+```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 
 plot(jitter(quality), trips,
   col = rgb(0, 0, 0, alpha = 0.5),
   main = "Relação entre trips e quality",
   xlab = "Qualidade",
   ylab = "N° de viagens",
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6,
-  cex.names = 0.75)
+  cex.main = 0.9, 
+  cex.lab = 0.8,
+  cex.axis = 0.7,
+  cex.names = 0.75,
+  las = 1)
 
 means <- tapply(trips, quality, mean)
 
-plot(
-  as.numeric(names(means)), means, type = "p",
-  xaxt = "n",
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
+
+barplot(
+  means,
+  names.arg = names(means),
   main = "Relação entre a média de trips e quality",
   xlab = "Qualidade",
   ylab = "N° médio de viagens",
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6
+  cex.main = 0.9,
+  cex.lab = 0.8,
+  cex.names = 0.7,
+  cex.axis = 0.7,
+  las = 1
 )
-
-axis(1, at = as.numeric(names(means)), labels = names(means), cex.axis = 0.6)
 ```
 
 Aparentemente, existe uma correlação entre essa covariável e a variável resposta, tornando-a potencialmente relevante para a modelagem.
 
-Além disso, apesar do problema de dados "desconhecidos" citado anteriormente, o uso dessa covariável mostra-se razoável, pois, como visto no gráfico da esquerda, a grande maioria dos registros com qualidade $0$ apresenta valor $0$ também para **trips**. Isso é semanticamente correto, dado que, como explicado na seção 2.1, **quality** é $0$ para registros de indivíduos que não viajaram ao lago Somerville, ou seja, cujo **trips** é $0$. Os dois registros que divergem dessa interpretação podem ser dados incorretos, perdidos ou cujos indivíduos apenas não avaliaram a qualidade das instalações do lago.
+Além disso, apesar do problema de dados "desconhecidos" citado anteriormente, o uso dessa covariável mostra-se razoável, pois, como visto no gráfico superior, a grande maioria dos registros com qualidade $0$ apresenta valor $0$ também para **trips**. Isso é semanticamente correto, dado que, como explicado na seção 1.2, **quality** é $0$ para registros de indivíduos que não viajaram ao lago Somerville, ou seja, cujo **trips** é $0$. Os dois registros que divergem dessa interpretação podem ser dados incorretos, perdidos ou cujos indivíduos apenas não avaliaram a qualidade das instalações do lago.
 
 Portanto, a covariável **quality** será incluída nos modelos que serão ajustados.
 
-### 3.1.3. Covariável *ski*
+### Covariável *ski*
 
-Abaixo está exibida a distribuição dessa variável:
+A seguir está exibida a distribuição dessa variável:
 
 ```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(1.8, 0.6, 0), mar = c(2, 4, 2, 2))
 barplot(
   table(ski),
   ylim = c(0, 500),
   main = "Distribuição da covariável ski",
   ylab = "Frequência",
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6,
-  cex.names = 0.75)
+  cex.main = 0.9, 
+  cex.lab = 0.8,
+  cex.axis = 0.7,
+  cex.names = 0.75,
+  las = 1)
 ```
 
 Existe um relativo equilíbrio entre ambos os valores de **ski**, tornando-a adequada para o uso nos modelos em estudo.
 
-A seguir, está apresentada a distribuição da variável resposta em função dessa covariável, tanto de forma bruta quanto agregada por meio da média.
+Abaixo, está apresentada a distribuição da variável resposta em função dessa covariável, tanto de forma bruta quanto agregada por meio da média.
 
-```{r, echo = FALSE, fig.width=7, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
-par(mfrow = c(1, 2))
+```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 
 plot(jitter(ifelse(ski == "yes", 1, 0)), trips,
   col = rgb(0, 0, 0, alpha = 0.5),
@@ -430,33 +451,36 @@ plot(jitter(ifelse(ski == "yes", 1, 0)), trips,
   main = "Relação entre trips e ski",
   xlab = "Praticou ski?",
   ylab = "N° de viagens",
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6,
-  cex.names = 0.75
+  cex.main = 0.9, 
+  cex.lab = 0.8,
+  cex.axis = 0.7,
+  cex.names = 0.75,
+  las = 1
 )
 
 axis(1, at = c(0, 1), labels = c("no", "yes"), cex.axis = 0.6)
 
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 barplot(
   tapply(trips, ski, mean),
   main = "Relação entre a média de trips e ski",
   xlab = "Praticou ski?",
   ylab = "N° médio de viagens",
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6,
-  cex.names = 0.75)
+  cex.main = 0.9, 
+  cex.lab = 0.8,
+  cex.axis = 0.7,
+  cex.names = 0.75,
+  las = 1)
 ```
 
-Analisando o gráfico à direita, é possível inferir que há uma certa influência da prática de ski aquático na quantidade de viagens de barco recreativas realizadas. Portanto, a covariável **ski** será considerada para os ajustes dos modelos de interesse.
+Analisando o gráfico inferior, é possível inferir que há uma certa influência da prática de ski aquático na quantidade de viagens de barco recreativas realizadas. Portanto, a covariável **ski** será considerada para os ajustes dos modelos de interesse.
 
-### 3.1.4. Covariável *income*
+### Covariável *income*
 
 Abaixo está apresentada a distribuição dessa variável:
 
-```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+```{r, echo = FALSE, fig.width=3.31, fig.height=2.31, fig.align='center'}
+par(mgp = c(1.8, 0.6, 0), mar = c(2, 4, 2, 2))
 barplot(
   table(income),
   ylim = c(0, 250),
@@ -465,16 +489,16 @@ barplot(
   cex.main = 0.8, 
   cex.lab = 0.7,
   cex.axis = 0.6,
-  cex.names = 0.75)
+  cex.names = 0.75,
+  las = 1)
 ```
 
 A distribuição dos dados sobre essa variável não apresenta problemas visíveis.
 
 A seguir, está plotada a distribuição de **trips** em relação a essa covariável, da mesma forma que com as anteriores.
 
-```{r, echo = FALSE, fig.width=7, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
-par(mfrow = c(1, 2))
+```{r, echo = FALSE, fig.width=3.31, fig.height=2.31, fig.align='center'}
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 
 plot(jitter(income), trips,
   col = rgb(0, 0, 0, alpha = 0.5),
@@ -484,33 +508,36 @@ plot(jitter(income), trips,
   cex.main = 0.8, 
   cex.lab = 0.7,
   cex.axis = 0.6,
-  cex.names = 0.75)
+  cex.names = 0.75,
+  las = 1)
 
 means <- tapply(trips, income, mean)
 
-plot(
-  as.numeric(names(means)), means, type = "p",
-  xaxt = "n",
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
+
+barplot(
+  means,
+  names.arg = names(means),
   main = "Relação entre a média de trips e income",
   xlab = "Renda (em milhares de dólares)",
   ylab = "N° médio de viagens",
-  ylim = c(0, 3.1),
-  cex.main = 0.8, 
+  cex.main = 0.8,
   cex.lab = 0.7,
-  cex.axis = 0.6
+  cex.names = 0.6,
+  cex.axis = 0.7,
+  las = 1
 )
 
-axis(1, at = as.numeric(names(means)), labels = names(means), cex.axis = 0.6)
 ```
 
 Parece existir uma relação entre essa covariável e a variável resposta **trips**, com valores maiores de renda implicando números menores de viagens. Dessa forma, a covariável **income** também será incluída nos ajustes dos modelos considerados.
 
-### 3.1.5. Covariável *userfee*
+### Covariável *userfee*
 
 Visualizando a distribuição dessa covariável, obtém-se:
 
-```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+```{r, echo = FALSE, fig.width=3.31, fig.height=2, fig.align='center'}
+par(mgp = c(1.8, 0.6, 0), mar = c(2, 4, 2, 2))
 barplot(
   table(userfee),
   ylim = c(0, 700),
@@ -519,16 +546,16 @@ barplot(
   cex.main = 0.8, 
   cex.lab = 0.7,
   cex.axis = 0.6,
-  cex.names = 0.75)
+  cex.names = 0.75,
+  las = 1)
 ```
 
 Nota-se um forte desbalanceamento nos valores dessa variável binária, o que pode afetar o desempenho dos modelos. Isso pode ocorrer devido à dificuldade de estimar precisamente o parâmetro referente à categoria mais rara ("yes") e à possibilidade de o modelo não detectar o efeito dessa covariável por causa da pequena quantidade de registros em uma das categorias.
 
 Ainda assim, será verificada a relação entre essa covariável e **trips**. Abaixo está o resultado:
 
-```{r, echo = FALSE, fig.width=7, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
-par(mfrow = c(1, 2))
+```{r, echo = FALSE, fig.width=3.31, fig.height=2, fig.align='center'}
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 
 plot(jitter(ifelse(userfee == "yes", 1, 0)), trips,
   col = rgb(0, 0, 0, alpha = 0.5),
@@ -539,11 +566,13 @@ plot(jitter(ifelse(userfee == "yes", 1, 0)), trips,
   cex.main = 0.8, 
   cex.lab = 0.7,
   cex.axis = 0.6,
-  cex.names = 0.75
+  cex.names = 0.9,
+  las = 1
 )
 
 axis(1, at = c(0, 1), labels = c("no", "yes"), cex.axis = 0.6)
 
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 barplot(
   tapply(trips, userfee, mean),
   main = "Relação entre a média de trips e userfee",
@@ -552,19 +581,19 @@ barplot(
   cex.main = 0.8, 
   cex.lab = 0.7,
   cex.axis = 0.6,
-  cex.names = 0.75)
+  cex.names = 0.7,
+  las = 1)
 ```
 
 Como visto, a covariável **userfee** parece influenciar de forma considerável o valor da variável resposta. No entanto, devido ao problema de desequilíbrio mostrado anteriormente, os dados da categoria rara podem introduzir ruído excessivo, não sendo adequados para o ajuste de modelos. Portanto, essa covariável não será considerada.
 
-### 3.1.6. Covariáveis *costC*, *costS* e *costH*
+### Covariáveis *costC*, *costS* e *costH*
 
 Por último, serão analisadas conjuntamente as 3 variáveis de despesas estimadas. A seguir, estão as distribuições dessas covariáveis.
 
-```{r, echo = FALSE, fig.width=11, fig.height=3, fig.align='center'}
-par(mfrow = c(1, 3))
+```{r, echo = FALSE, fig.width=3.3, fig.height=2.3, fig.align='center'}
 
-par(mgp = c(2.1, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(2.1, 0.6, 0), mar = c(3.5, 4, 2, 2))
 hist(
   costC,
   breaks = 50,
@@ -572,38 +601,41 @@ hist(
   main = "Despesas para o lago Conroe",
   xlab = "Número de viagens",
   ylab = "Frequência",
-  cex.main = 1.5, 
-  cex.lab = 1.5,
-  cex.axis = 1)
+  cex.main = 0.8, 
+  cex.lab = 0.7,
+  cex.axis = 0.6,
+  las = 1)
 
-par(mgp = c(2.1, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(2.1, 0.6, 0), mar = c(3.5, 4, 2, 2))
 hist(
   costS,
   breaks = 50,
   ylim = c(0, 140),
   main = "Despesas para o lago Somerville",
   xlab = "Número de viagens",
-  ylab = "",
-  cex.main = 1.5, 
-  cex.lab = 1.5,
-  cex.axis = 1)
+  ylab = "Frequência",
+  cex.main = 0.8, 
+  cex.lab = 0.7,
+  cex.axis = 0.6,
+  las = 1)
 
-par(mgp = c(2.1, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(2.1, 0.6, 0), mar = c(3.5, 4, 2, 2))
 hist(
   costH,
   breaks = 50,
   ylim = c(0, 140),
   main = "Despesas para o lago Houston",
   xlab = "Número de viagens",
-  ylab = "",
-  cex.main = 1.5, 
-  cex.lab = 1.5,
-  cex.axis = 1)
+  ylab = "Frequência",
+  cex.main = 0.8, 
+  cex.lab = 0.7,
+  cex.axis = 0.6,
+  las = 1)
 ```
 
 Suas distribuições são bem similares, o que sugere uma relação de colinearidade entre elas. Para investigar isso, será verificada a correlação entre essas três variáveis aos pares:
 
-```{r, echo = FALSE, fig.width=3, fig.height=3, fig.align='center'}
+```{r, echo = FALSE, fig.width=2.9, fig.height=2.9, fig.align='center'}
 df <- na.omit(RecreationDemand[, c("costC", "costS", "costH")])
 
 plot_custom <- function(data, mapping, ...) {
@@ -618,7 +650,7 @@ ggpairs(
   df,
   upper = list(continuous = plot_custom),
   lower = list(continuous = plot_custom),
-  diag = list(continuous = function(...) return(NULL)),  # remove a diagonal
+  diag = list(continuous = function(...) return(NULL)),
   title = "Relações entre as variáveis cost"
 ) +
   theme_minimal() +
@@ -631,7 +663,7 @@ ggpairs(
 
 É evidente a colinearidade entre essas variáveis. Assim, para manter o princípio da independência das covariáveis e evitar problemas como falta de identificabilidade, será utilizada apenas uma delas na modelagem. Para realizar essa escolha, serão analisadas as correlações entre cada uma dessas variáveis e a variável resposta **trips**. Abaixo estão os resultados:
 
-```{r, echo = FALSE, fig.width=7, fig.height=3, fig.align='center'}
+```{r, echo = FALSE}
 cat("-> Correlação com trips:\n")
 cat("costC:", cor(RecreationDemand$trips, RecreationDemand$costC, use = "complete.obs"), "\n")
 cat("costS:", cor(RecreationDemand$trips, RecreationDemand$costS, use = "complete.obs"), "\n")
@@ -642,7 +674,7 @@ Dessa forma, conclui-se que, do ponto de vista de correlação, a variável **co
 
 Portanto, as variáveis **costC** e **costH** serão descartadas, mantendo-se apenas **costS**.
 
-### 3.1.7. Resumo
+### Resumo
 
 Finalmente, com base em todas as análises realizadas previamente, as variáveis que serão utilizadas no ajuste dos modelos são:
 
@@ -651,9 +683,9 @@ Finalmente, com base em todas as análises realizadas previamente, as variáveis
 - **income**
 - **costS**
 
-## 3.2. Ajuste do modelo Poisson
+## Ajuste do modelo Poisson
 
-A seguir, será realizado o ajuste do modelo Poisson, como definido na seção 2.2.1, aos dados de interesse, modelando a variável resposta **trips** em função das covariáveis listadas na seção anterior.
+A seguir, será realizado o ajuste do modelo Poisson, como definido na seção 2.1.1, aos dados de interesse, modelando a variável resposta **trips** em função das covariáveis listadas na seção anterior.
 
 Vale ressaltar que a covariável **costS** foi transformada por meio de uma divisão por 100. Isso mostrou-se adequado após alguns testes que mostraram que seu coeficiente possuia magnitude inferior à dos demais, o que é causado pelo fato de sua unidade ser *dólares*, enquanto **income**, por exemplo, é medida em *milhares de dólares*. Assim, com sua nova unidade de medida sendo *centenas de dólares*, seu coeficiente torna-se mais comparável e mais interpretável.
 
@@ -669,29 +701,51 @@ RecreationDemand$income_c = income - mean(income)
 RecreationDemand$costS_100_c = costS_100 - mean(costS_100)
 
 model_poisson = glm(trips ~ quality + ski + income_c + costS_100_c, data = RecreationDemand, family = poisson())
-summary(model_poisson)
+
+coefs = summary(model_poisson)$coefficients
+est = coefs[, "Estimate"]
+se = coefs[, "Std. Error"]
+pvalues = coefs[, "Pr(>|z|)"]
+pvalues = ifelse(pvalues < 2e-16, "<2e-16", sprintf("%.3f", pvalues))
+null_dev <- model_poisson$null.deviance
+resid_dev <- model_poisson$deviance
+
+model_aic = AIC(model_poisson)
+
+cat(sprintf("Resultados do GLM Poisson (AIC = %.0f)\n", model_aic))
+cat(sprintf("Deviances: nulo ------ %.2f\n", null_dev))
+cat(sprintf("           residual -- %.2f\n\n", resid_dev))
+cat("Coef.         Est.     SE      p-valor         \n")
+cat("--------------------------------------\n")
+
+for (i in seq_along(est)) {
+  cat(sprintf("%-12s %7.3f %7.3f   %6s\n",
+              rownames(coefs)[i], est[i], se[i], pvalues[i]))
+}
+
 ```
 
 Como pode ser observado por meio dos intervalos de confiança de cada parâmetro e de seus respectivos p-valores, todos eles se mostraram estatisticamente significativos sob esse modelo.
 
-### 3.2.1. Avaliação do modelo
+### Avaliação do modelo
 
-A seguir, serão aplicadas algumas das estatísticas e testes descritos na seção 2.4 para avaliar esse modelo.
+A seguir, serão aplicadas algumas das estatísticas e testes descritos na seção 2.3 para avaliar esse modelo.
 
 **Resíduos de Pearson**
 
 Primeiramente, será avaliada a distribuição dos resíduos de Pearson em função dos valores preditos para a variável resposta:
 
 ```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 plot(fitted(model_poisson), residuals(model_poisson, type = "pearson"),
   main = "Resíduos de Pearson x Valor previsto (Poisson)",
   xlab = "Valor previsto",
   ylab = "Resíduo",
   ylim = c(-5, 45),
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6)
+  cex.main = 0.9, 
+  cex.lab = 0.8,
+  cex.axis = 0.7,
+  las = 1)
 abline(h = 0, col = "red")
 ```
 
@@ -734,9 +788,9 @@ cat("Pseudo-R2:", pseudo_R2_poisson)
 
 Com base nessa estatística, é possível inferir que o modelo de Poisson ajustado obteve uma melhoria de aproximadamente $36\%$ em seu desempenho quando comparado com o modelo minimal da mesma família, o que indica um resultado razoável, mas que pode ser melhorado com o uso de outros modelos, como será apresentado a seguir.
 
-## 3.3. Teste para sobredispersão
+## Teste para sobredispersão
 
-Nesse momento, será realizado o teste de sobredispersão definido na seção 2.3, aplicado sobre os dados de interesse. Após o ajuste da estatística de teste às previsões, o resultado obtido foi o seguinte:
+Nesse momento, será realizado o teste de sobredispersão definido na seção 2.2, aplicado sobre os dados de interesse. Após o ajuste da estatística de teste às previsões, o resultado obtido foi o seguinte:
 
 ```{r, echo = FALSE}
 pred_poisson = predict(model_poisson)
@@ -746,53 +800,140 @@ z = ((trips - pred_poisson)^2 - trips)/pred_poisson
 overdispersion_data = data.frame(z = z, pred = pred_poisson)
 
 overdispersion_model = glm(z ~ pred + 0, data = overdispersion_data)
-summary(overdispersion_model)
+
+coefs = summary(overdispersion_model)$coefficients
+est = coefs[, "Estimate"]
+se = coefs[, "Std. Error"]
+pvalues = coefs[, "Pr(>|t|)"]
+pvalues = ifelse(pvalues < 2e-16, "<2e-16", sprintf("%.3f", pvalues))
+
+model_aic = AIC(overdispersion_model)
+
+cat(sprintf("Resultados da Sobredispersão\n\n"))
+cat("Coef.         Est.     SE      p-valor         \n")
+cat("--------------------------------------\n")
+
+for (i in seq_along(est)) {
+  cat(sprintf("%-12s %7.3f %7.3f   %5s\n",
+              rownames(coefs)[i], est[i], se[i], pvalues[i]))
+}
 ```
 
 Como é possível observar, o parâmetro do modelo possui considerável significância estatística, o que sugere a existência de sobredispersão nesses dados. Isso justifica o desempenho mediano do modelo Poisson sobre eles. Na próxima seção, será ajustado um modelo Binomial Negativo com o objetivo de tentar contornar esse problema.
 
-## 3.4. Ajuste do modelo Binomial Negativo
+## Ajuste do modelo Binomial Negativo
 
-A seguir, será ajustado um modelo Binomial Negativo aos dados em estudo conforme definido na seção 2.2.2 e com as mesmas covariáveis e respectivas transformações que o modelo de Poisson. Será utilizado o método `glm.nb` da biblioteca **MASS** do R.
+A seguir, será ajustado um modelo Binomial Negativo aos dados em estudo conforme definido na seção 2.1.2 e com as mesmas covariáveis e respectivas transformações utilizadas no modelo Poisson. Será utilizado o método `glm.nb` da biblioteca **MASS** do R.
 
 ```{r, echo = FALSE}
 library(MASS)
 
 model_nb = glm.nb(trips ~ quality + ski + income_c + costS_100_c, data = RecreationDemand)
-summary(model_nb)
+
+# Resumo do modelo
+summary_nb <- summary(model_nb)
+
+# Coeficientes
+coefs <- summary_nb$coefficients
+est <- coefs[, "Estimate"]
+se <- coefs[, "Std. Error"]
+pval <- coefs[, "Pr(>|z|)"]
+pval_str <- ifelse(pval < 2e-16, "<2e-16", sprintf("%.3f", pval))
+
+# Theta e seu erro padrão
+theta <- summary_nb$theta
+theta_se <- summary_nb$SE.theta
+
+# AIC e deviances
+model_aic <- AIC(model_nb)
+null_dev <- model_nb$null.deviance
+resid_dev <- model_nb$deviance
+
+# Impressão formatada
+cat(sprintf("Resultados do GLM NegBin (AIC = %.1f)\n", model_aic))
+cat(sprintf("Phi = %.4f (SE = %.4f)\n", theta, theta_se))
+cat(sprintf("Deviances: nulo ------ %.2f\n", null_dev))
+cat(sprintf("           residual -- %.2f\n\n", resid_dev))
+
+cat("Coef.         Est.     SE      p-valor\n")
+cat("--------------------------------------\n")
+for (i in seq_along(est)) {
+  cat(sprintf("%-12s %7.3f %7.3f   %6s\n",
+              rownames(coefs)[i], est[i], se[i], pval_str[i]))
+}
 ```
 
-Ao contrário do modelo de Poisson, nesse modelo, nem todos os coeficientes se mostraram significativos: o coeficiente da covariável **income** perdeu sua significância. Uma possível razão para isso é a inclusão do parâmetro de sobredispersão $\phi$ (ou $\theta$ pela parametrização do método `glm.nb`), que absorveu a variância que o modelo Poisson estava tentando ajustar por meio da covariável **income**. Dessa forma, será ajustado um novo modelo sem essa covariável de forma a respeitar o princípio da parcimônia.
+Ao contrário do modelo de Poisson, nesse modelo, nem todos os coeficientes se mostraram significativos: o coeficiente da covariável **income** perdeu sua significância. Uma possível razão para isso é a inclusão do parâmetro de sobredispersão $\phi$, que absorveu a variância que o modelo Poisson estava tentando ajustar por meio da covariável **income**. Dessa forma, será ajustado um novo modelo sem essa covariável de forma a respeitar o princípio da parcimônia.
+
+```{=latex}
+\vspace{3cm}
+```
 
 ```{r, echo = FALSE}
 model_nb = glm.nb(trips ~ quality + ski + costS_100_c, data = RecreationDemand)
-summary(model_nb)
+
+# Resumo do modelo
+summary_nb <- summary(model_nb)
+
+# Coeficientes
+coefs <- summary_nb$coefficients
+est <- coefs[, "Estimate"]
+se <- coefs[, "Std. Error"]
+pval <- coefs[, "Pr(>|z|)"]
+pval_str <- ifelse(pval < 2e-16, "<2e-16", sprintf("%.3f", pval))
+
+# Theta e seu erro padrão
+theta <- summary_nb$theta
+theta_se <- summary_nb$SE.theta
+
+# AIC e deviances
+model_aic <- AIC(model_nb)
+null_dev <- model_nb$null.deviance
+resid_dev <- model_nb$deviance
+
+# Impressão formatada
+cat(sprintf("Resultados do GLM NegBin (AIC = %.1f)\n", model_aic))
+cat(sprintf("Phi = %.4f (SE = %.4f)\n", theta, theta_se))
+cat(sprintf("Deviances: nulo ------ %.2f\n", null_dev))
+cat(sprintf("           residual -- %.2f\n\n", resid_dev))
+
+cat("Coef.         Est.     SE      p-valor\n")
+cat("--------------------------------------\n")
+for (i in seq_along(est)) {
+  cat(sprintf("%-12s %7.3f %7.3f   %6s\n",
+              rownames(coefs)[i], est[i], se[i], pval_str[i]))
+}
 ```
 
 Os coeficientes estimados para as três covariáveis restantes apresentam significância estatística.
 
 A seguir, serão realizadas as avaliações desse ajuste semelhantemente a como foi feito com o modelo Poisson. Comparações entre os resultados dos modelos serão efetuadas após o ajuste dos 3 modelos em estudo.
 
-### 3.4.1. Avaliação do modelo
+### Avaliação do modelo
 
 **Resíduos de Pearson**
 
 A primeira análise realizada será sobre a distribuição dos resíduos de Pearson:
 
 ```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 plot(fitted(model_nb), residuals(model_nb, type = "pearson"),
   main = "Resíduos de Pearson x Valor previsto (NBin)",
   xlab = "Valor previsto",
   ylab = "Resíduo",
   ylim = c(-5, 45),
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6)
+  cex.main = 0.9, 
+  cex.lab = 0.8,
+  cex.axis = 0.7,
+  las = 1)
 abline(h = 0, col = "red")
 ```
 
 É notável a concentração dos resíduos em valores próximos de zero, o que sugere um bom ajuste. Além disso, nota-se que os poucos resíduos com maior magnitude são positivos, indicando que o modelo ainda subestima alguns pontos de dados, ou seja, o valor verdadeiro da variável resposta é bem maior que o previsto. Isso mostra que, apesar de modelar a variância dos dados mais eficientemente que o modelo Poisson, o modelo Binomial Negativo ainda comete alguns erros semelhantes aos cometidos por esse último.
+
+```{=latex}
+\vspace{2cm}
+```
 
 **Estatística qui-quadrado de razão de verossimilhança**
 
@@ -831,9 +972,9 @@ cat("Pseudo-R2:", pseudo_R2_nb)
 
 Dessa forma, segundo essa estatística, o modelo Binomial Negativo ajustado gerou uma melhoria de aproximadamente $15\%$ no desempenho quando comparado com o modelo minimal da mesma família. Isso parece fraco, mas pode ser causado pelo fato de a verossimilhança do modelo nulo já ser considerável, o que diminui a relevância de ajustes melhores.
 
-Além disso, esse valor é menor que o obtido pelo modelo Poisson, mas, como explicado na seção 2.4.5, esses valores não são comparáveis por virem de modelos de famílias diferentes.
+Além disso, esse valor é menor que o obtido pelo modelo Poisson, mas, como explicado na seção 2.3.5, esses valores não são comparáveis por virem de modelos de famílias diferentes.
 
-## 3.5. Ajuste do modelo Poisson inflado de zeros
+## Ajuste do modelo Poisson inflado de zeros
 
 Para o ajuste do modelo Poisson inflado de zeros, foram escolhidas, com base em testes preliminares, a covariável **quality** para a modelagem da etapa logística e as demais para a modelagem da etapa de contagem. Assim, feito o ajuste, o resultado obtido foi o seguinte:
 
@@ -846,31 +987,61 @@ model_zip = glmmTMB(trips ~ ski + income_c + costS_100_c,
                     family = poisson,
                     data = RecreationDemand)
 
-summary(model_zip)
+# Resumo do modelo
+summary_zinf <- summary(model_zip)
+
+# Extrai coeficientes
+coefs_cond <- summary_zinf$coefficients$cond
+coefs_zi <- summary_zinf$coefficients$zi
+
+# AIC
+model_aic <- AIC(model_zip)
+
+# Função auxiliar para imprimir uma tabela formatada
+print_coef_table <- function(coefs, title) {
+  est <- coefs[, "Estimate"]
+  se <- coefs[, "Std. Error"]
+  pval <- coefs[, "Pr(>|z|)"]
+  pval_str <- ifelse(pval < 2e-16, "<2e-16", sprintf("%.3f", pval))
+  
+  cat(title, "\n")
+  cat("Coef.         Est.     SE      p-valor\n")
+  cat("--------------------------------------\n")
+  for (i in seq_along(est)) {
+    cat(sprintf("%-12s %7.3f %7.3f   %6s\n",
+                rownames(coefs)[i], est[i], se[i], pval_str[i]))
+  }
+  cat("\n")
+}
+
+# Imprime resultados
+cat(sprintf("Resultados do Modelo ZIP (AIC = %.1f)\n\n", model_aic))
+print_coef_table(coefs_cond, "Modelo Condicional:")
+print_coef_table(coefs_zi, "Modelo de Inflação Zero:")
 ```
 
-Dada a seleção de covariáveis realizada, todos os coeficientes mostram-se estatisticamente significativos.
+Dada a seleção de covariáveis realizada, todos os coeficientes mostraram-se estatisticamente significativos.
 
 A seguir, esse modelo será avaliado segundo as mesmas métricas aplicadas sobre os modelos anteriores.
 
-### 3.5.1. Avaliação do ajuste
+### Avaliação do ajuste
 
 **Resíduos de Pearson**
 
 ```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(1.8, 0.6, 0), mar = c(3, 4, 2, 2))
 plot(fitted(model_zip), residuals(model_zip, type = "pearson"),
   main = "Resíduos de Pearson x Valor previsto (ZIP)",
   xlab = "Valor previsto",
   ylab = "Resíduo",
   ylim = c(-5, 45),
-  cex.main = 0.8, 
-  cex.lab = 0.7,
-  cex.axis = 0.6)
+  cex.main = 0.9, 
+  cex.lab = 0.8,
+  cex.axis = 0.7)
 abline(h = 0, col = "red")
 ```
 
-Nota-se uma concentração dos resíduos mais proeminentes em valores positivos, indicando que, assim como o modelo Poisson, o modelo ZIP não foi tão eficiente ao absorver a variância gerada pela sobredispersão. Isso é perfeitamente válido, já que, apesar de ser um modelo mais elaborado, a base de sua modelagem de contagem ainda é uma distribuição Poisson convencional, que considera a média e a variância iguais. Na próxima seção, será verificado se ele conseguiu mitigar o problema do excesso de zeros.
+Nota-se uma concentração dos resíduos mais proeminentes em valores positivos, indicando que, assim como o modelo Poisson, o modelo ZIP não foi tão eficiente ao absorver a variância gerada pela sobredispersão. Isso é perfeitamente válido, já que, apesar de ser um modelo mais elaborado, a base de sua modelagem de contagem ainda é uma distribuição Poisson convencional, que considera a média e a variância como iguais. Na próxima seção, será verificado se ele conseguiu mitigar o problema do excesso de zeros.
 
 **Estatística qui-quadrado de razão de verossimilhança**
 
@@ -915,15 +1086,18 @@ cat("Pseudo-R2:", pseudo_R2_zip)
 
 Portanto, esse modelo apresenta uma melhoria de aproximadamente $25\%$ na verossimilhança em comparação com o modelo minimal, ajustado sem o uso de covariáveis explicativas. Assim, ele apresenta uma performance considerável, embora ainda permita a exploração de modelos mais elaborados ou a inserção de covariáveis adicionais.
 
-## 3.6. Comparação dos modelos
+## Comparação dos modelos
 
-Finalmente, nesta seção, será efetuada a comparação dos desempenhos dos três modelos ajustados, analisando-se, para esse fim, seus coeficientes estimados, as distribuições de seus resíduos de Pearson, suas estatísticas AIC (definido e justificado na seção 2.4.4) e seus resultados na modelagem dos valores zero.
+Finalmente, nesta seção, será efetuada a comparação dos desempenhos dos três modelos ajustados, analisando-se, para esse fim, seus coeficientes estimados, as distribuições de seus resíduos de Pearson, suas estatísticas AIC (definido e justificado na seção 2.3.4) e seus resultados na modelagem dos valores zero.
 
-### 3.6.1. Coeficientes estimados
+### Coeficientes estimados
 
 A seguir, apresenta-se uma tabela com os valores estimados por cada modelo para os coeficientes de cada covariável utilizada. Vale lembrar que a interpretação desses parâmetros varia entre os modelos, principalmente no caso do modelo misto ZIP.
 
-```{r, echo = FALSE}
+
+```{r, echo = FALSE, results = 'asis'}
+library(xtable)
+
 coef_poisson = coef(model_poisson)
 coef_nb = coef(model_nb)
 coef_zip_poisson = fixef(model_zip)$cond
@@ -935,56 +1109,75 @@ coef_table <- data.frame(
   Termo = all_terms,
   Poisson = coef_poisson[all_terms],
   NegBin = coef_nb[all_terms],
-  ZIP_Poisson = coef_zip_poisson[all_terms],
-  ZIP_Bin = coef_zip_bin[all_terms]
+  ZIP.Pois = coef_zip_poisson[all_terms],
+  ZIP.Bin = coef_zip_bin[all_terms]
 )
 
-knitr::kable(coef_table, row.names = FALSE)
+coef_table$Termo <- gsub("_", "\\\\_", coef_table$Termo)
+
+tab_latex <- capture.output(
+  print(
+    xtable(coef_table),
+    floating = FALSE,
+    include.rownames = FALSE,
+    sanitize.text.function = identity
+  )
+)
+
+tab_latex <- tab_latex[!grepl("^%", tab_latex)]
+
+cat("\\begin{center}\n")
+cat("\\footnotesize\n")
+cat(paste(tab_latex, collapse = "\n"))
+cat("\\end{center}\n")
+cat("\\normalsize\n")
 ```
 
 Em resumo, todos os modelos apontam direções semelhantes nos efeitos das covariáveis utilizadas sobre a variável resposta **trips**, o que pode ser observado pelos sinais dos coeficientes estimados em cada modelo. Os únicos casos que não obedecem a esse padrão são os interceptos e o coeficiente de **quality**. Com relação a esse último, enquanto os modelos de Poisson e Binomial Negativo apresentam valores positivos para esse parâmetro, a etapa Binomial do modelo ZIP atribui a ele um valor negativo. Embora pareça contraintuitivo, esse resultado é coerente, já que, nesse modelo ZIP, quanto maior o valor de **quality**, menor a probabilidade de a variável resposta ser zerada e, com isso, maior seu valor potencial, indicando uma relação positiva entre essas variáveis, consistente com os demais modelos. Portanto, eles estão de acordo com respeito às direções dessas correlações.
 
-### 3.6.2. Resíduos de Pearson
+### Resíduos de Pearson
 
-A seguir, estão dispostos lado a lado os gráficos das distribuições dos resíduos de Pearson de cada modelo para que seja realizada uma comparação entre seus desempenhos.
+A seguir, estão dispostos em conjunto os gráficos das distribuições dos resíduos de Pearson de cada modelo para que seja realizada uma comparação entre seus desempenhos.
 
-```{r, echo = FALSE, fig.width=11, fig.height=3, fig.align='center'}
-par(mfrow = c(1, 3))
+```{r, echo = FALSE, fig.width=4, fig.height=3, fig.align='center'}
 
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 2))
 plot(fitted(model_poisson), residuals(model_poisson, type = "pearson"),
   main = "Poisson",
   xlab = "Valor previsto",
   ylab = "Resíduo",
   xlim = c(-1, 60),
   ylim = c(-5, 45),
-  cex.main = 1.3, 
-  cex.lab = 1.2,
-  cex.axis = 1)
+  cex.main = 1.1, 
+  cex.lab = 1,
+  cex.axis = 0.9,
+  las = 1)
 abline(h = 0, col = "red")
 
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 2))
 plot(fitted(model_nb), residuals(model_nb, type = "pearson"),
   main = "Binomial Negativo",
   xlab = "Valor previsto",
   ylab = "",
   xlim = c(-1, 60),
   ylim = c(-5, 45),
-  cex.main = 1.3, 
-  cex.lab = 1.2,
-  cex.axis = 1)
+  cex.main = 1.1, 
+  cex.lab = 1,
+  cex.axis = 0.9,
+  las = 1)
 abline(h = 0, col = "red")
 
-par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 1))
+par(mgp = c(1.8, 0.6, 0), mar = c(4, 4, 2, 2))
 plot(fitted(model_zip), residuals(model_zip, type = "pearson"),
   main = "ZIP",
   xlab = "Valor previsto",
   ylab = "",
   xlim = c(-1, 60),
   ylim = c(-5, 45),
-  cex.main = 1.3, 
-  cex.lab = 1.2,
-  cex.axis = 1)
+  cex.main = 1.1, 
+  cex.lab = 1,
+  cex.axis = 0.9,
+  las = 1)
 abline(h = 0, col = "red")
 ```
 
@@ -992,11 +1185,11 @@ Como pode ser observado, tanto o modelo Poisson quando o ZIP (que também utiliz
 
 Por outro lado, o modelo Binomial Negativo apresenta uma distribuição mais simétrica e próxima do zero, indicando um ajuste mais apropriado aos dados. Isso pode ser justificado pela inclusão de um parâmetro de sobredispersão, que permite a ele absorver de forma mais eficiente a variância gerada pelos registros extremos.
 
-### 3.6.3. AIC
+### AIC
 
 Em seguida, serão comparadas as estatísticas AIC dos três modelos em estudo.
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, results = 'asis'}
 aic_poisson <- AIC(model_poisson)
 aic_nb      <- AIC(model_nb)
 aic_zip     <- AIC(model_zip)
@@ -1006,14 +1199,27 @@ aic_table <- data.frame(
   AIC   = c(aic_poisson, aic_nb, aic_zip)
 )
 
-knitr::kable(aic_table, row.names = FALSE)
+tab_latex <- capture.output(
+  print(
+    xtable(aic_table),
+    floating = FALSE,
+    include.rownames = FALSE,
+    sanitize.text.function = identity
+  )
+)
+
+tab_latex <- tab_latex[!grepl("^%", tab_latex)]
+
+cat("\\begin{center}\n")
+cat(paste(tab_latex, collapse = "\n"))
+cat("\n\\end{center}\n")
 ```
 
-Notavelmente, o modelo Binomial Negativo obteve um desempenho superior que os modelos baseados na distribuição Poisson, devido à incorporação do coeficiente de sobredispersão, que permite a ele separar a média da variância e, assim, modelar de maneira mais adequada os valores extremos.
+Notavelmente, o modelo Binomial Negativo obteve um desempenho superior ao dos modelos baseados na distribuição Poisson, devido à incorporação do coeficiente de sobredispersão, que permite a ele separar a média da variância e, assim, modelar de maneira mais adequada os valores extremos.
 
-Enquanto isso, o modelo ZIP apresenta um risco estimado menor que o Poisson tradicional, o que se justifica pela sua capacidade de modelar os zeros estruturais da variável resposta (o que será demonstrado a seguir). Entretanto, ainda não apresenta um ajuste tão apropriado quanto o do modelo Binomial Negativo devido à falta da modelagem da sobredispersão presente nesse último.
+Enquanto isso, o modelo ZIP apresenta um risco estimado menor que o Poisson tradicional, o que se justifica pela sua capacidade de modelar os zeros estruturais da variável resposta (o que será demonstrado a seguir). Entretanto, ainda não apresenta um ajuste tão apropriado quanto o do modelo Binomial Negativo devido à falta da modelagem da sobredispersão, presente nesse último.
 
-### 3.6.4. Desempenho na modelagem dos valores zero
+### Desempenho na modelagem dos valores zero
 
 Por fim, será avaliado como cada um desses modelos desempenha com relação à modelagem e previsão dos valores zero da variável resposta **trips**. Para isso, em cada modelo:
 
@@ -1023,7 +1229,7 @@ Por fim, será avaliado como cada um desses modelos desempenha com relação à 
 
 Esse processo será realizado 1000 vezes e a média dos resultados será considerada para garantir uma estimativa estável dessa quantidade. Os resultados estão exibidos a seguir:
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, results = 'asis'}
 n_sim = 100
 
 true_zeros = sum(trips == 0)
@@ -1057,22 +1263,35 @@ for (i in 1:n_sim) {
 
 mean_zeros = data.frame(
   Modelo         = c("REAL", "Poisson", "NegBin", "ZIP"),
-  Media_Zeros    = c(true_zeros,
+  MediaZeros    = c(true_zeros,
                      mean(zero_counts_poisson),
                      mean(zero_counts_nb),
                      mean(zero_counts_zip))
 )
 
-knitr::kable(mean_zeros, row.names = FALSE, digits = 1)
+tab_latex <- capture.output(
+  print(
+    xtable(mean_zeros),
+    floating = FALSE,
+    include.rownames = FALSE,
+    sanitize.text.function = identity
+  )
+)
+
+tab_latex <- tab_latex[!grepl("^%", tab_latex)]
+
+cat("\\begin{center}\n")
+cat(paste(tab_latex, collapse = "\n"))
+cat("\n\\end{center}\n")
 ```
 
 Analisando a tabela, é possível concluir que, de fato, o modelo Poisson não estava ajustando de forma adequada o excesso de zeros dos dados da variável **trips**, prevendo muito menos valores zero que a quantidade verdadeira. Por outro lado, tanto o modelo Binomial Negativo quanto o modelo ZIP apresentaram desempenho aceitável nesse quesito. Nota-se, então, que a maior elaboração do modelo Poisson ao construir um modelo misto, o ZIP, foi capaz de corrigir a deficiência do modelo clássico com relação à modelagem desses valores. Enquanto isso, a própria inclusão de um coeficiente de sobredispersão já foi suficiente para o modelo Binomial Negativo obter uma boa capacidade de representar os zeros observados.
 
-# 4. Discussão e Conclusão
+# Discussão e Conclusão
 
 Portanto, com base nos experimentos e análises conduzidos, pode-se concluir que a presença de sobredispersão na variável resposta a ser modelada pode comprometer significativamente o desempenho de modelos estatísticos quando não levada em consideração. Isso é exemplificado pela aplicação de um modelo Poisson aos dados em estudo, o que gerou resultados insatisfatórios na modelagem tanto de valores extremos quanto de valores zero excessivos.
 
-Ao refinar essa estratégia por meio da adoção de um modelo Poisson inflado de zeros (ZIP), o desempenho relacionado ao excesso de zeros obteve uma melhora significativa, sendo capaz de absorver e modelar os zeros estruturais presentes na base. Entretanto, ele ainda apresentou desempenho insatisfatório na modelagem de valores extremos, resultantes da alta variância dos dados.
+Ao refinar essa estratégia por meio da adoção de um modelo Poisson inflado de zeros (ZIP), o desempenho relacionado ao excesso de zeros obteve uma melhora significativa, com o modelo sendo capaz de absorver e modelar os zeros estruturais presentes na base. Entretanto, ele ainda apresentou desempenho insatisfatório na modelagem de valores extremos, resultantes da alta variância dos dados.
 
 Por fim, a inclusão de um coeficiente de sobredispersão por meio da utilização de um modelo Binomial Negativo permitiu que as consequências geradas pela alta variância fossem mitigadas, como mostrado pelos resíduos relativamente pequenos quando comparados aos resíduos dos modelos Poisson e ZIP. Ao mesmo tempo, essa nova característica também forneceu ao modelo a capacidade de modelar os zeros estruturais, proporcionando um desempenho geral superior aos demais modelos, sendo, portanto, preferível dentre os modelos analisados.
 

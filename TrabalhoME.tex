@@ -3,7 +3,7 @@
 \PassOptionsToPackage{hyphens}{url}
 %
 \documentclass[
-]{article}
+  twocolumn]{article}
 \usepackage{amsmath,amssymb}
 \usepackage{iftex}
 \ifPDFTeX
@@ -36,17 +36,6 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\usepackage[margin=1in]{geometry}
-\usepackage{longtable,booktabs,array}
-\usepackage{calc} % for calculating minipage widths
-% Correct order of tables after \paragraph or \subparagraph
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
-\makeatother
-% Allow footnotes in longtable head/foot
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
 \usepackage{graphicx}
 \makeatletter
 \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
@@ -63,8 +52,12 @@
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\setcounter{secnumdepth}{5}
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
 \usepackage{setspace}
+\usepackage{multicol}
+\usepackage[brazilian]{babel}
+\setlength{\columnsep}{0.75cm}
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
@@ -80,6 +73,9 @@
 
 \begin{document}
 
+\twocolumn[
+\begin{@twocolumnfalse}
+
 \begin{center}
 {\LARGE \textbf{Sobredispersão em Modelos de Contagem}\\
 Modelagem Estatística \par}
@@ -90,24 +86,26 @@ Modelagem Estatística \par}
 {\large \today \par}
 \end{center}
 
-\section{1. Introdução}\label{introduuxe7uxe3o}
+\vspace{1cm}
+\end{@twocolumnfalse}
+]
+
+\section{Introdução}\label{introduuxe7uxe3o}
 
 O presente trabalho tem como objetivo investigar a sobredispersão em
-dados de contagem e seus efeitos no ajuste de modelos lineares
-generalizados (GLMs). Serão considerados modelos de regressão Poisson,
-Binomial Negativo e Poisson inflado de zeros, aplicados a dados de
-turismo da região do Texas, nos Estados Unidos. Busca-se avaliar como a
-sobredispersão afeta o desempenho desses modelos, bem como discutir
-estratégias para reduzir seus impactos e melhorar a qualidade dos
-ajustes.
+dados de contagem e seus efeitos no ajuste de modelos estatísticos, como
+modelos lineares generalizados (GLMs). Serão considerados modelos de
+regressão Poisson, Binomial Negativo e Poisson inflado de zeros,
+aplicados a dados de turismo da região do Texas, nos Estados Unidos.
+Busca-se avaliar como a sobredispersão afeta o desempenho desses
+modelos, bem como discutir estratégias para reduzir seus impactos e
+melhorar a qualidade dos ajustes.
 
-\section{2. Métodos}\label{muxe9todos}
-
-\subsection{2.1. Os dados}\label{os-dados}
+\subsection{Os dados}\label{os-dados}
 
 Os dados utilizados para este estudo foram retirados da biblioteca
 Applied Econometrics with R (AER)\footnote{\url{https://rdrr.io/cran/AER/}}.
-Será utilizada a base RecreationalDemand\footnote{\url{https://rdrr.io/cran/AER/man/RecreationDemand.html}},
+Será utilizada a base RecreationDemand\footnote{\url{https://rdrr.io/cran/AER/man/RecreationDemand.html}},
 que contém dados sobre o número de viagens de barco recreativas ao Lago
 Somerville, no Texas, em 1980, com base em uma pesquisa administrada a
 2000 proprietários de barcos de lazer registrados em 23 condados do
@@ -130,7 +128,7 @@ seguir:
   lago;
 \item
   \textbf{income}: assume valores naturais e representa a renda familiar
-  anual do entrevistado (milhares de dólares);
+  anual do entrevistado (em milhares de dólares);
 \item
   \textbf{userfee}: assume valores ``yes'' ou ``no'' e indica se o
   indivíduo pagou uma taxa anual de uso do Lago Somerville;
@@ -150,7 +148,9 @@ Uma limitação apresentada por esses dados diz respeito à variável
 valor 0 para indivíduos que não haviam visitado o lago Somerville, que,
 como veremos mais adiante, compõem a maioria dos registros.
 
-\subsection{2.2. Os modelos}\label{os-modelos}
+\section{Métodos}\label{muxe9todos}
+
+\subsection{Os modelos}\label{os-modelos}
 
 No presente trabalho, o objetivo no que se refere à modelagem será
 regredir a variável de contagem \textbf{trips} sobre outras das
@@ -159,12 +159,12 @@ realizada por meio de uma análise exploratória de cada uma delas, em que
 serão exploradas tanto suas distribuições univariadas quanto suas
 relações com a variável resposta.
 
-Serão considerados nesse estudo 3 modelos estatísticos da família dos
-modelos lineares generalizados (GLMs), descritos a seguir.
+Serão considerados nesse estudo 3 modelos estatísticos, descritos a
+seguir.
 
-\subsubsection{2.2.1. Modelo Poisson}\label{modelo-poisson}
+\subsubsection{Modelo Poisson}\label{modelo-poisson}
 
-Frequentemente utilizada para modelar dados de contagem, a regressão de
+Frequentemente utilizada para modelar dados de contagem, a regressão
 Poisson possui a seguinte forma:
 
 \[
@@ -174,7 +174,7 @@ Y_i \sim \text{Poisson}(\theta_i) \\
 \end{array}
 \]
 
-onde \(Y_i\) é a variável resposta (no nosso caso, \textbf{trips}) e
+onde \(Y_i\) é a variável resposta (nesse caso, \textbf{trips}) e
 \(X_i\) é o vetor das covariáveis de interesse, ambos indexados pelo
 i-ésimo registro. Aqui, a função de ligação utilizada é a canônica para
 a família Poisson: \(g(\mu_i) = \log({X_i}^T\beta)\).
@@ -240,8 +240,7 @@ preferência são:
   computacionalmente, como citado no item anterior.
 \end{itemize}
 
-\subsubsection{2.2.2. Modelo Binomial
-Negativo}\label{modelo-binomial-negativo}
+\subsubsection{Modelo Binomial Negativo}\label{modelo-binomial-negativo}
 
 Utilizado principalmente como um substituto do modelo Poisson, o modelo
 Binomial Negativo possui a seguinte forma:
@@ -312,7 +311,7 @@ otimização em duas etapas:
 
 Esse processo é repetido até os parâmetros convergirem.
 
-\subsubsection{2.2.3. Modelo Poisson inflado de
+\subsubsection{Modelo Poisson inflado de
 zeros}\label{modelo-poisson-inflado-de-zeros}
 
 O modelo Poisson inflado de zeros (ZIP da sigla em inglês) é uma
@@ -360,7 +359,7 @@ aproximação numérica, serão utilizados métodos numéricos que não serão
 discutidos aqui, dada sua complexidade. O método de Fisher Scoring não
 pode ser aplicado diretamente devido à estrutura mista do problema.
 
-\subsection{2.3. Teste de sobredispersão sob modelo
+\subsection{Teste de sobredispersão sob modelo
 Poisson}\label{teste-de-sobredispersuxe3o-sob-modelo-poisson}
 
 Após o ajuste do modelo Poisson aos dados de interesse, será realizado
@@ -375,8 +374,8 @@ na seguinte modelagem da variância da variável resposta:
 Var(Y_i) = \mu_i + \alpha \mu_i^2
 \]
 
-Assim, a hipótese nula diz que \(\alpha = 0\) e, portanto, o modelo de
-Poisson é adequado. Por outro lado, a hipótese alternativa afirma que
+Assim, a hipótese nula diz que \(\alpha = 0\) e que, portanto, o modelo
+de Poisson é adequado. Por outro lado, a hipótese alternativa afirma que
 \(\alpha > 0\), tornando esse modelo inadequado.
 
 Primeiramente, deve-se ajustar um modelo de Poisson aos dados. Em
@@ -392,7 +391,9 @@ a diferença entre a variância observada e a variância esperada sob a
 hipótese nula. Nota-se que, sob essa hipótese:
 
 \[
-\mathbb{E}[Z_i] = \dfrac{\mathbb{E}[(Y_i - \hat{\mu_i})^2] - \mathbb{E}[Y_i]}{\hat{\mu_i}} = \dfrac{Var(Y_i) - \hat{\mu_i}}{\hat{\mu_i}} = \dfrac{\hat{\mu_i} - \hat{\mu_i}}{\hat{\mu_i}} = 0
+\begin{aligned}
+\mathbb{E}[Z_i] &= \dfrac{\mathbb{E}[(Y_i - \hat{\mu_i})^2] - \mathbb{E}[Y_i]}{\hat{\mu_i}} = \dfrac{Var(Y_i) - \hat{\mu_i}}{\hat{\mu_i}} = \\ &= \dfrac{\hat{\mu_i} - \hat{\mu_i}}{\hat{\mu_i}} = 0
+\end{aligned}
 \]
 
 Com base nisso, a etapa final desse teste consiste em ajustar uma
@@ -404,13 +405,13 @@ parametrização da variância descrita acima. Portanto, caso \(\beta\)
 seja estatisticamente significativo e positivo, há forte evidência da
 presença de sobredispersão.
 
-\subsection{2.4. Critérios de
+\subsection{Critérios de
 avaliação}\label{crituxe9rios-de-avaliauxe7uxe3o}
 
 A seguir, estão descritos os principais critérios utilizados para a
 avaliação do desempenho dos modelos ajustados.
 
-\subsubsection{2.4.1. Intervalo de confiança aproximado dos
+\subsubsection{Intervalo de confiança aproximado dos
 parâmetros}\label{intervalo-de-confianuxe7a-aproximado-dos-paruxe2metros}
 
 Para a avaliação da significância dos parâmetros do ajuste, será
@@ -427,7 +428,7 @@ Assim, é possível calcular um intervalo de confiança aproximado para
 cada parâmetro e verificar se ele contém o valor 0. Caso não contenha, é
 altamente provável que ele seja estatisticamente significativo.
 
-\subsubsection{2.4.2. Resíduos de Pearson}\label{resuxedduos-de-pearson}
+\subsubsection{Resíduos de Pearson}\label{resuxedduos-de-pearson}
 
 Os resíduos de Pearson são uma forma de quantificar a distância entre os
 valores observados e os valores preditos por um modelo. O resíduo para o
@@ -457,7 +458,7 @@ pobre se as frequências esperadas são muito pequenas, que é o caso desse
 problema, como será mostrado mais adiante. Portanto, a utilização dessa
 estatística não é viável.
 
-\subsubsection{2.4.3. Estatística qui-quadrado de razão de
+\subsubsection{Estatística qui-quadrado de razão de
 verossimilhança}\label{estatuxedstica-qui-quadrado-de-razuxe3o-de-verossimilhanuxe7a}
 
 Seja \(l(\hat{\beta}; y)\) a log-verossimilhança do modelo de interesse
@@ -497,7 +498,7 @@ estatisticamente significativo comparado com essa distribuição
 qui-quadrado, então é altamente provável que as covariáveis utilizadas
 sejam relevantes.
 
-\subsubsection{2.4.4. AIC}\label{aic}
+\subsubsection{AIC}\label{aic}
 
 O Akaike Information Criterion (AIC) é uma medida utilizada para avaliar
 e comparar modelos ajustados a um conjunto de dados. Ele pode ser
@@ -513,8 +514,7 @@ Seu cálculo dá-se pela seguinte fórmula:
 
 com os mesmos significados já definidos anteriormente.
 
-\subsubsection{\texorpdfstring{2.4.5.
-Pseudo-\(\text{R}^2\)}{2.4.5. Pseudo-\textbackslash text\{R\}\^{}2}}\label{pseudo-textr2}
+\subsubsection{\texorpdfstring{Pseudo-\(\text{R}^2\)}{Pseudo-\textbackslash text\{R\}\^{}2}}\label{pseudo-textr2}
 
 O pseudo-\(\text{R}^2\) é um análogo do \(\text{R}^2\) da regressão
 linear múltipla para outros modelos, como regressão logística, Poisson e
@@ -535,7 +535,7 @@ comparação de modelos de famílias diferentes, dado que as funções de
 log-verossimilhança podem possuir escalas distintas. Assim, ela será
 utilizada apenas para a avaliação interna de modelos.
 
-\subsection{2.5. Ferramentas}\label{ferramentas}
+\subsection{Ferramentas}\label{ferramentas}
 
 Para a realização de todas as análises, ajustes de modelos e gerações de
 visualizações, foi utilizado o software estatístico R. A biblioteca
@@ -548,14 +548,14 @@ para o ajuste do modelo Binomial Negativo e um da biblioteca
 \textbf{glmmTMB}\footnote{\url{https://cran.r-project.org/web/packages/glmmTMB/index.html}}
 para o ajuste do modelo de inflação de zeros.
 
-\section{3. Resultados}\label{resultados}
+\section{Resultados}\label{resultados}
 
 A seguir, serão exibidos e analisados os resultados obtidos a partir da
 análise exploratória dos dados, seguidos dos ajustes e interpretações
 dos modelos de interesse, além da aplicação do teste de sobredispersão
-descrito na seção 2.3.
+descrito na seção 2.2.
 
-\subsection{3.1. Análise exploratória e seleção de
+\subsection{Análise exploratória e seleção de
 covariáveis}\label{anuxe1lise-exploratuxf3ria-e-seleuxe7uxe3o-de-covariuxe1veis}
 
 Inicialmente, será apresentada uma análise a respeito da variável de
@@ -564,8 +564,8 @@ covariáveis da base em estudo serão analisadas com o objetivo de
 selecionar previamente variáveis potencialmente mais adequadas para o
 ajuste dos modelos.
 
-\subsubsection{\texorpdfstring{3.1.1. Variável resposta
-\emph{trips}}{3.1.1. Variável resposta trips}}\label{variuxe1vel-resposta-trips}
+\subsubsection{\texorpdfstring{Variável resposta
+\emph{trips}}{Variável resposta trips}}\label{variuxe1vel-resposta-trips}
 
 Abaixo está a distribuição dessa variável:
 
@@ -590,8 +590,8 @@ aumenta o efeito na variância dos valores não nulos. Assim, há um forte
 indício de sobredispersão que possivelmente afetará o desempenho do
 modelo Poisson, como será discutido nas próximas seções.
 
-\subsubsection{\texorpdfstring{3.1.2. Covariável
-\emph{quality}}{3.1.2. Covariável quality}}\label{covariuxe1vel-quality}
+\subsubsection{\texorpdfstring{Covariável
+\emph{quality}}{Covariável quality}}\label{covariuxe1vel-quality}
 
 Abaixo está a distribuição dessa variável:
 
@@ -604,20 +604,22 @@ não haviam visitado o lago e que, com isso, não avaliaram a qualidade de
 suas instalações. Portanto, são equivalentes a valores desconhecidos.
 
 A seguir, é apresentada a distribuição dos valores de \textbf{trips} em
-função da covariável \textbf{quality}, sendo plotados todos os pontos à
-esquerda (com jitter para facilitar a visualização) e apenas as médias
-dentro de cada valor de \textbf{quality} à direita.
+função da covariável \textbf{quality}, sendo plotados todos os pontos
+acima (com jitter para facilitar a visualização) e apenas as médias
+dentro de cada valor de \textbf{quality} abaixo.
 
 \begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-5-1} \end{center}
+
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-5-2} \end{center}
 
 Aparentemente, existe uma correlação entre essa covariável e a variável
 resposta, tornando-a potencialmente relevante para a modelagem.
 
 Além disso, apesar do problema de dados ``desconhecidos'' citado
 anteriormente, o uso dessa covariável mostra-se razoável, pois, como
-visto no gráfico da esquerda, a grande maioria dos registros com
-qualidade \(0\) apresenta valor \(0\) também para \textbf{trips}. Isso é
-semanticamente correto, dado que, como explicado na seção 2.1,
+visto no gráfico superior, a grande maioria dos registros com qualidade
+\(0\) apresenta valor \(0\) também para \textbf{trips}. Isso é
+semanticamente correto, dado que, como explicado na seção 1.2,
 \textbf{quality} é \(0\) para registros de indivíduos que não viajaram
 ao lago Somerville, ou seja, cujo \textbf{trips} é \(0\). Os dois
 registros que divergem dessa interpretação podem ser dados incorretos,
@@ -627,29 +629,31 @@ instalações do lago.
 Portanto, a covariável \textbf{quality} será incluída nos modelos que
 serão ajustados.
 
-\subsubsection{\texorpdfstring{3.1.3. Covariável
-\emph{ski}}{3.1.3. Covariável ski}}\label{covariuxe1vel-ski}
+\subsubsection{\texorpdfstring{Covariável
+\emph{ski}}{Covariável ski}}\label{covariuxe1vel-ski}
 
-Abaixo está exibida a distribuição dessa variável:
+A seguir está exibida a distribuição dessa variável:
 
 \begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-6-1} \end{center}
 
 Existe um relativo equilíbrio entre ambos os valores de \textbf{ski},
 tornando-a adequada para o uso nos modelos em estudo.
 
-A seguir, está apresentada a distribuição da variável resposta em função
+Abaixo, está apresentada a distribuição da variável resposta em função
 dessa covariável, tanto de forma bruta quanto agregada por meio da
 média.
 
 \begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-7-1} \end{center}
 
-Analisando o gráfico à direita, é possível inferir que há uma certa
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-7-2} \end{center}
+
+Analisando o gráfico inferior, é possível inferir que há uma certa
 influência da prática de ski aquático na quantidade de viagens de barco
 recreativas realizadas. Portanto, a covariável \textbf{ski} será
 considerada para os ajustes dos modelos de interesse.
 
-\subsubsection{\texorpdfstring{3.1.4. Covariável
-\emph{income}}{3.1.4. Covariável income}}\label{covariuxe1vel-income}
+\subsubsection{\texorpdfstring{Covariável
+\emph{income}}{Covariável income}}\label{covariuxe1vel-income}
 
 Abaixo está apresentada a distribuição dessa variável:
 
@@ -663,13 +667,15 @@ essa covariável, da mesma forma que com as anteriores.
 
 \begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-9-1} \end{center}
 
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-9-2} \end{center}
+
 Parece existir uma relação entre essa covariável e a variável resposta
 \textbf{trips}, com valores maiores de renda implicando números menores
 de viagens. Dessa forma, a covariável \textbf{income} também será
 incluída nos ajustes dos modelos considerados.
 
-\subsubsection{\texorpdfstring{3.1.5. Covariável
-\emph{userfee}}{3.1.5. Covariável userfee}}\label{covariuxe1vel-userfee}
+\subsubsection{\texorpdfstring{Covariável
+\emph{userfee}}{Covariável userfee}}\label{covariuxe1vel-userfee}
 
 Visualizando a distribuição dessa covariável, obtém-se:
 
@@ -687,20 +693,25 @@ Ainda assim, será verificada a relação entre essa covariável e
 
 \begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-11-1} \end{center}
 
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-11-2} \end{center}
+
 Como visto, a covariável \textbf{userfee} parece influenciar de forma
 considerável o valor da variável resposta. No entanto, devido ao
 problema de desequilíbrio mostrado anteriormente, os dados da categoria
 rara podem introduzir ruído excessivo, não sendo adequados para o ajuste
 de modelos. Portanto, essa covariável não será considerada.
 
-\subsubsection{\texorpdfstring{3.1.6. Covariáveis \emph{costC},
-\emph{costS} e
-\emph{costH}}{3.1.6. Covariáveis costC, costS e costH}}\label{covariuxe1veis-costc-costs-e-costh}
+\subsubsection{\texorpdfstring{Covariáveis \emph{costC}, \emph{costS} e
+\emph{costH}}{Covariáveis costC, costS e costH}}\label{covariuxe1veis-costc-costs-e-costh}
 
 Por último, serão analisadas conjuntamente as 3 variáveis de despesas
 estimadas. A seguir, estão as distribuições dessas covariáveis.
 
 \begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-12-1} \end{center}
+
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-12-2} \end{center}
+
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-12-3} \end{center}
 
 Suas distribuições são bem similares, o que sugere uma relação de
 colinearidade entre elas. Para investigar isso, será verificada a
@@ -741,7 +752,7 @@ esse mesmo lago, melhorando a interpretação do modelo.
 Portanto, as variáveis \textbf{costC} e \textbf{costH} serão
 descartadas, mantendo-se apenas \textbf{costS}.
 
-\subsubsection{3.1.7. Resumo}\label{resumo}
+\subsubsection{Resumo}\label{resumo}
 
 Finalmente, com base em todas as análises realizadas previamente, as
 variáveis que serão utilizadas no ajuste dos modelos são:
@@ -758,11 +769,10 @@ variáveis que serão utilizadas no ajuste dos modelos são:
   \textbf{costS}
 \end{itemize}
 
-\subsection{3.2. Ajuste do modelo
-Poisson}\label{ajuste-do-modelo-poisson}
+\subsection{Ajuste do modelo Poisson}\label{ajuste-do-modelo-poisson}
 
 A seguir, será realizado o ajuste do modelo Poisson, como definido na
-seção 2.2.1, aos dados de interesse, modelando a variável resposta
+seção 2.1.1, aos dados de interesse, modelando a variável resposta
 \textbf{trips} em função das covariáveis listadas na seção anterior.
 
 Vale ressaltar que a covariável \textbf{costS} foi transformada por meio
@@ -780,39 +790,41 @@ interpretação.
 Abaixo está o resultado do ajuste segundo \texttt{glm()} do R:
 
 \begin{verbatim}
-## 
-## Call:
-## glm(formula = trips ~ quality + ski + income_c + costS_100_c, 
-##     family = poisson(), data = RecreationDemand)
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(>|z|)    
-## (Intercept) -0.97360    0.06797 -14.323   <2e-16 ***
-## quality      0.55895    0.01574  35.511   <2e-16 ***
-## skiyes       0.53674    0.05563   9.649   <2e-16 ***
-## income_c    -0.16754    0.01922  -8.719   <2e-16 ***
-## costS_100_c -1.66734    0.10259 -16.253   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for poisson family taken to be 1)
-## 
-##     Null deviance: 4849.7  on 658  degrees of freedom
-## Residual deviance: 2835.9  on 654  degrees of freedom
-## AIC: 3599
-## 
-## Number of Fisher Scoring iterations: 7
+## Resultados do GLM Poisson (AIC = 3599)
+\end{verbatim}
+
+\begin{verbatim}
+## Deviances: nulo ------ 4849.69
+\end{verbatim}
+
+\begin{verbatim}
+##            residual -- 2835.88
+\end{verbatim}
+
+\begin{verbatim}
+## Coef.         Est.     SE      p-valor
+\end{verbatim}
+
+\begin{verbatim}
+## --------------------------------------
+\end{verbatim}
+
+\begin{verbatim}
+## (Intercept)   -0.974   0.068   <2e-16
+## quality        0.559   0.016   <2e-16
+## skiyes         0.537   0.056   <2e-16
+## income_c      -0.168   0.019   <2e-16
+## costS_100_c   -1.667   0.103   <2e-16
 \end{verbatim}
 
 Como pode ser observado por meio dos intervalos de confiança de cada
 parâmetro e de seus respectivos p-valores, todos eles se mostraram
 estatisticamente significativos sob esse modelo.
 
-\subsubsection{3.2.1. Avaliação do
-modelo}\label{avaliauxe7uxe3o-do-modelo}
+\subsubsection{Avaliação do modelo}\label{avaliauxe7uxe3o-do-modelo}
 
 A seguir, serão aplicadas algumas das estatísticas e testes descritos na
-seção 2.4 para avaliar esse modelo.
+seção 2.3 para avaliar esse modelo.
 
 \textbf{Resíduos de Pearson}
 
@@ -866,31 +878,27 @@ desempenho quando comparado com o modelo minimal da mesma família, o que
 indica um resultado razoável, mas que pode ser melhorado com o uso de
 outros modelos, como será apresentado a seguir.
 
-\subsection{3.3. Teste para
+\subsection{Teste para
 sobredispersão}\label{teste-para-sobredispersuxe3o}
 
 Nesse momento, será realizado o teste de sobredispersão definido na
-seção 2.3, aplicado sobre os dados de interesse. Após o ajuste da
+seção 2.2, aplicado sobre os dados de interesse. Após o ajuste da
 estatística de teste às previsões, o resultado obtido foi o seguinte:
 
 \begin{verbatim}
-## 
-## Call:
-## glm(formula = z ~ pred + 0, data = overdispersion_data)
-## 
-## Coefficients:
-##      Estimate Std. Error t value Pr(>|t|)   
-## pred   21.028      7.961   2.641  0.00846 **
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for gaussian family taken to be 74336.33)
-## 
-##     Null deviance: 49431888  on 659  degrees of freedom
-## Residual deviance: 48913308  on 658  degrees of freedom
-## AIC: 9264.7
-## 
-## Number of Fisher Scoring iterations: 2
+## Resultados da Sobredispersão
+\end{verbatim}
+
+\begin{verbatim}
+## Coef.         Est.     SE      p-valor
+\end{verbatim}
+
+\begin{verbatim}
+## --------------------------------------
+\end{verbatim}
+
+\begin{verbatim}
+## pred          21.028   7.961   0.008
 \end{verbatim}
 
 Como é possível observar, o parâmetro do modelo possui considerável
@@ -899,84 +907,85 @@ nesses dados. Isso justifica o desempenho mediano do modelo Poisson
 sobre eles. Na próxima seção, será ajustado um modelo Binomial Negativo
 com o objetivo de tentar contornar esse problema.
 
-\subsection{3.4. Ajuste do modelo Binomial
+\subsection{Ajuste do modelo Binomial
 Negativo}\label{ajuste-do-modelo-binomial-negativo}
 
 A seguir, será ajustado um modelo Binomial Negativo aos dados em estudo
-conforme definido na seção 2.2.2 e com as mesmas covariáveis e
-respectivas transformações que o modelo de Poisson. Será utilizado o
-método \texttt{glm.nb} da biblioteca \textbf{MASS} do R.
+conforme definido na seção 2.1.2 e com as mesmas covariáveis e
+respectivas transformações utilizadas no modelo Poisson. Será utilizado
+o método \texttt{glm.nb} da biblioteca \textbf{MASS} do R.
 
 \begin{verbatim}
-## 
-## Call:
-## glm.nb(formula = trips ~ quality + ski + income_c + costS_100_c, 
-##     data = RecreationDemand, init.theta = 0.4459740411, link = log)
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(>|z|)    
-## (Intercept) -1.82879    0.14713 -12.430  < 2e-16 ***
-## quality      0.91343    0.04257  21.456  < 2e-16 ***
-## skiyes       0.55795    0.17019   3.278  0.00104 ** 
-## income_c    -0.06561    0.04817  -1.362  0.17314    
-## costS_100_c -1.29493    0.24695  -5.244 1.57e-07 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for Negative Binomial(0.446) family taken to be 1)
-## 
-##     Null deviance: 923.49  on 658  degrees of freedom
-## Residual deviance: 455.70  on 654  degrees of freedom
-## AIC: 1817.5
-## 
-## Number of Fisher Scoring iterations: 1
-## 
-## 
-##               Theta:  0.4460 
-##           Std. Err.:  0.0418 
-## Warning while fitting theta: alternation limit reached 
-## 
-##  2 x log-likelihood:  -1805.4710
+## Resultados do GLM NegBin (AIC = 1817.5)
+\end{verbatim}
+
+\begin{verbatim}
+## Phi = 0.4460 (SE = 0.0418)
+\end{verbatim}
+
+\begin{verbatim}
+## Deviances: nulo ------ 923.49
+\end{verbatim}
+
+\begin{verbatim}
+##            residual -- 455.70
+\end{verbatim}
+
+\begin{verbatim}
+## Coef.         Est.     SE      p-valor
+\end{verbatim}
+
+\begin{verbatim}
+## --------------------------------------
+\end{verbatim}
+
+\begin{verbatim}
+## (Intercept)   -1.829   0.147   <2e-16
+## quality        0.913   0.043   <2e-16
+## skiyes         0.558   0.170    0.001
+## income_c      -0.066   0.048    0.173
+## costS_100_c   -1.295   0.247    0.000
 \end{verbatim}
 
 Ao contrário do modelo de Poisson, nesse modelo, nem todos os
 coeficientes se mostraram significativos: o coeficiente da covariável
 \textbf{income} perdeu sua significância. Uma possível razão para isso é
-a inclusão do parâmetro de sobredispersão \(\phi\) (ou \(\theta\) pela
-parametrização do método \texttt{glm.nb}), que absorveu a variância que
-o modelo Poisson estava tentando ajustar por meio da covariável
-\textbf{income}. Dessa forma, será ajustado um novo modelo sem essa
-covariável de forma a respeitar o princípio da parcimônia.
+a inclusão do parâmetro de sobredispersão \(\phi\), que absorveu a
+variância que o modelo Poisson estava tentando ajustar por meio da
+covariável \textbf{income}. Dessa forma, será ajustado um novo modelo
+sem essa covariável de forma a respeitar o princípio da parcimônia.
+
+\vspace{3cm}
 
 \begin{verbatim}
-## 
-## Call:
-## glm.nb(formula = trips ~ quality + ski + costS_100_c, data = RecreationDemand, 
-##     init.theta = 0.4398523177, link = log)
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(>|z|)    
-## (Intercept) -1.82952    0.14719 -12.429  < 2e-16 ***
-## quality      0.92045    0.04283  21.493  < 2e-16 ***
-## skiyes       0.52564    0.16509   3.184  0.00145 ** 
-## costS_100_c -1.40482    0.24875  -5.647 1.63e-08 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for Negative Binomial(0.4399) family taken to be 1)
-## 
-##     Null deviance: 915.43  on 658  degrees of freedom
-## Residual deviance: 453.57  on 655  degrees of freedom
-## AIC: 1817.1
-## 
-## Number of Fisher Scoring iterations: 1
-## 
-## 
-##               Theta:  0.4399 
-##           Std. Err.:  0.0410 
-## Warning while fitting theta: alternation limit reached 
-## 
-##  2 x log-likelihood:  -1807.1110
+## Resultados do GLM NegBin (AIC = 1817.1)
+\end{verbatim}
+
+\begin{verbatim}
+## Phi = 0.4399 (SE = 0.0410)
+\end{verbatim}
+
+\begin{verbatim}
+## Deviances: nulo ------ 915.43
+\end{verbatim}
+
+\begin{verbatim}
+##            residual -- 453.57
+\end{verbatim}
+
+\begin{verbatim}
+## Coef.         Est.     SE      p-valor
+\end{verbatim}
+
+\begin{verbatim}
+## --------------------------------------
+\end{verbatim}
+
+\begin{verbatim}
+## (Intercept)   -1.830   0.147   <2e-16
+## quality        0.920   0.043   <2e-16
+## skiyes         0.526   0.165    0.001
+## costS_100_c   -1.405   0.249    0.000
 \end{verbatim}
 
 Os coeficientes estimados para as três covariáveis restantes apresentam
@@ -986,8 +995,7 @@ A seguir, serão realizadas as avaliações desse ajuste semelhantemente a
 como foi feito com o modelo Poisson. Comparações entre os resultados dos
 modelos serão efetuadas após o ajuste dos 3 modelos em estudo.
 
-\subsubsection{3.4.1. Avaliação do
-modelo}\label{avaliauxe7uxe3o-do-modelo-1}
+\subsubsection{Avaliação do modelo}\label{avaliauxe7uxe3o-do-modelo-1}
 
 \textbf{Resíduos de Pearson}
 
@@ -1004,6 +1012,8 @@ alguns pontos de dados, ou seja, o valor verdadeiro da variável resposta
 variância dos dados mais eficientemente que o modelo Poisson, o modelo
 Binomial Negativo ainda comete alguns erros semelhantes aos cometidos
 por esse último.
+
+\vspace{2cm}
 
 \textbf{Estatística qui-quadrado de razão de verossimilhança}
 
@@ -1045,10 +1055,10 @@ nulo já ser considerável, o que diminui a relevância de ajustes
 melhores.
 
 Além disso, esse valor é menor que o obtido pelo modelo Poisson, mas,
-como explicado na seção 2.4.5, esses valores não são comparáveis por
+como explicado na seção 2.3.5, esses valores não são comparáveis por
 virem de modelos de famílias diferentes.
 
-\subsection{3.5. Ajuste do modelo Poisson inflado de
+\subsection{Ajuste do modelo Poisson inflado de
 zeros}\label{ajuste-do-modelo-poisson-inflado-de-zeros}
 
 Para o ajuste do modelo Poisson inflado de zeros, foram escolhidas, com
@@ -1057,40 +1067,34 @@ modelagem da etapa logística e as demais para a modelagem da etapa de
 contagem. Assim, feito o ajuste, o resultado obtido foi o seguinte:
 
 \begin{verbatim}
-##  Family: poisson  ( log )
-## Formula:          trips ~ ski + income_c + costS_100_c
-## Zero inflation:         ~quality
-## Data: RecreationDemand
-## 
-##       AIC       BIC    logLik -2*log(L)  df.resid 
-##    2631.8    2658.7   -1309.9    2619.8       653 
-## 
-## 
-## Conditional model:
-##             Estimate Std. Error z value Pr(>|z|)    
-## (Intercept)  1.38474    0.04610  30.037  < 2e-16 ***
-## skiyes       0.52836    0.05752   9.185  < 2e-16 ***
-## income_c    -0.12716    0.01981  -6.418 1.38e-10 ***
-## costS_100_c -1.50350    0.10260 -14.654  < 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Zero-inflation model:
-##             Estimate Std. Error z value Pr(>|z|)    
-## (Intercept)   2.9731     0.2283   13.02   <2e-16 ***
-## quality      -1.6184     0.1213  -13.34   <2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## Resultados do Modelo ZIP (AIC = 2631.8)
+\end{verbatim}
+
+\begin{verbatim}
+## Modelo Condicional: 
+## Coef.         Est.     SE      p-valor
+## --------------------------------------
+## (Intercept)    1.385   0.046   <2e-16
+## skiyes         0.528   0.058   <2e-16
+## income_c      -0.127   0.020    0.000
+## costS_100_c   -1.504   0.103   <2e-16
+\end{verbatim}
+
+\begin{verbatim}
+## Modelo de Inflação Zero: 
+## Coef.         Est.     SE      p-valor
+## --------------------------------------
+## (Intercept)    2.973   0.228   <2e-16
+## quality       -1.618   0.121   <2e-16
 \end{verbatim}
 
 Dada a seleção de covariáveis realizada, todos os coeficientes
-mostram-se estatisticamente significativos.
+mostraram-se estatisticamente significativos.
 
 A seguir, esse modelo será avaliado segundo as mesmas métricas aplicadas
 sobre os modelos anteriores.
 
-\subsubsection{3.5.1. Avaliação do
-ajuste}\label{avaliauxe7uxe3o-do-ajuste}
+\subsubsection{Avaliação do ajuste}\label{avaliauxe7uxe3o-do-ajuste}
 
 \textbf{Resíduos de Pearson}
 
@@ -1101,8 +1105,8 @@ positivos, indicando que, assim como o modelo Poisson, o modelo ZIP não
 foi tão eficiente ao absorver a variância gerada pela sobredispersão.
 Isso é perfeitamente válido, já que, apesar de ser um modelo mais
 elaborado, a base de sua modelagem de contagem ainda é uma distribuição
-Poisson convencional, que considera a média e a variância iguais. Na
-próxima seção, será verificado se ele conseguiu mitigar o problema do
+Poisson convencional, que considera a média e a variância como iguais.
+Na próxima seção, será verificado se ele conseguiu mitigar o problema do
 excesso de zeros.
 
 \textbf{Estatística qui-quadrado de razão de verossimilhança}
@@ -1142,36 +1146,35 @@ uso de covariáveis explicativas. Assim, ele apresenta uma performance
 considerável, embora ainda permita a exploração de modelos mais
 elaborados ou a inserção de covariáveis adicionais.
 
-\subsection{3.6. Comparação dos
-modelos}\label{comparauxe7uxe3o-dos-modelos}
+\subsection{Comparação dos modelos}\label{comparauxe7uxe3o-dos-modelos}
 
 Finalmente, nesta seção, será efetuada a comparação dos desempenhos dos
 três modelos ajustados, analisando-se, para esse fim, seus coeficientes
 estimados, as distribuições de seus resíduos de Pearson, suas
-estatísticas AIC (definido e justificado na seção 2.4.4) e seus
+estatísticas AIC (definido e justificado na seção 2.3.4) e seus
 resultados na modelagem dos valores zero.
 
-\subsubsection{3.6.1. Coeficientes
-estimados}\label{coeficientes-estimados}
+\subsubsection{Coeficientes estimados}\label{coeficientes-estimados}
 
 A seguir, apresenta-se uma tabela com os valores estimados por cada
 modelo para os coeficientes de cada covariável utilizada. Vale lembrar
 que a interpretação desses parâmetros varia entre os modelos,
 principalmente no caso do modelo misto ZIP.
 
-\begin{longtable}[]{@{}lrrrr@{}}
-\toprule\noalign{}
-Termo & Poisson & NegBin & ZIP\_Poisson & ZIP\_Bin \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-(Intercept) & -0.9736011 & -1.8295192 & 1.3847435 & 2.973119 \\
-quality & 0.5589451 & 0.9204542 & NA & -1.618418 \\
-skiyes & 0.5367447 & 0.5256364 & 0.5283603 & NA \\
-income\_c & -0.1675428 & NA & -0.1271612 & NA \\
-costS\_100\_c & -1.6673412 & -1.4048156 & -1.5035012 & NA \\
-\end{longtable}
+\begin{center}
+\footnotesize
+\begin{tabular}{lrrrr}
+  \hline
+Termo & Poisson & NegBin & ZIP.Pois & ZIP.Bin \\ 
+  \hline
+(Intercept) & -0.97 & -1.83 & 1.38 & 2.97 \\ 
+  quality & 0.56 & 0.92 &  & -1.62 \\ 
+  skiyes & 0.54 & 0.53 & 0.53 &  \\ 
+  income\_c & -0.17 &  & -0.13 &  \\ 
+  costS\_100\_c & -1.67 & -1.40 & -1.50 &  \\ 
+   \hline
+\end{tabular}\end{center}
+\normalsize
 
 Em resumo, todos os modelos apontam direções semelhantes nos efeitos das
 covariáveis utilizadas sobre a variável resposta \textbf{trips}, o que
@@ -1188,14 +1191,17 @@ positiva entre essas variáveis, consistente com os demais modelos.
 Portanto, eles estão de acordo com respeito às direções dessas
 correlações.
 
-\subsubsection{3.6.2. Resíduos de
-Pearson}\label{resuxedduos-de-pearson-1}
+\subsubsection{Resíduos de Pearson}\label{resuxedduos-de-pearson-1}
 
-A seguir, estão dispostos lado a lado os gráficos das distribuições dos
+A seguir, estão dispostos em conjunto os gráficos das distribuições dos
 resíduos de Pearson de cada modelo para que seja realizada uma
 comparação entre seus desempenhos.
 
 \begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-30-1} \end{center}
+
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-30-2} \end{center}
+
+\begin{center}\includegraphics{TrabalhoME_files/figure-latex/unnamed-chunk-30-3} \end{center}
 
 Como pode ser observado, tanto o modelo Poisson quando o ZIP (que também
 utiliza a distribuição Poisson) estimam valores muito menores que o
@@ -1211,25 +1217,25 @@ aos dados. Isso pode ser justificado pela inclusão de um parâmetro de
 sobredispersão, que permite a ele absorver de forma mais eficiente a
 variância gerada pelos registros extremos.
 
-\subsubsection{3.6.3. AIC}\label{aic-1}
+\subsubsection{AIC}\label{aic-1}
 
 Em seguida, serão comparadas as estatísticas AIC dos três modelos em
 estudo.
 
-\begin{longtable}[]{@{}lr@{}}
-\toprule\noalign{}
-Modelo & AIC \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-Poisson & 3598.955 \\
-NegBin & 1817.111 \\
-ZIP & 2631.776 \\
-\end{longtable}
+\begin{center}
+\begin{tabular}{lr}
+  \hline
+Modelo & AIC \\ 
+  \hline
+Poisson & 3598.95 \\ 
+  NegBin & 1817.11 \\ 
+  ZIP & 2631.78 \\ 
+   \hline
+\end{tabular}
+\end{center}
 
 Notavelmente, o modelo Binomial Negativo obteve um desempenho superior
-que os modelos baseados na distribuição Poisson, devido à incorporação
+ao dos modelos baseados na distribuição Poisson, devido à incorporação
 do coeficiente de sobredispersão, que permite a ele separar a média da
 variância e, assim, modelar de maneira mais adequada os valores
 extremos.
@@ -1239,9 +1245,9 @@ Poisson tradicional, o que se justifica pela sua capacidade de modelar
 os zeros estruturais da variável resposta (o que será demonstrado a
 seguir). Entretanto, ainda não apresenta um ajuste tão apropriado quanto
 o do modelo Binomial Negativo devido à falta da modelagem da
-sobredispersão presente nesse último.
+sobredispersão, presente nesse último.
 
-\subsubsection{3.6.4. Desempenho na modelagem dos valores
+\subsubsection{Desempenho na modelagem dos valores
 zero}\label{desempenho-na-modelagem-dos-valores-zero}
 
 Por fim, será avaliado como cada um desses modelos desempenha com
@@ -1264,18 +1270,18 @@ Esse processo será realizado 1000 vezes e a média dos resultados será
 considerada para garantir uma estimativa estável dessa quantidade. Os
 resultados estão exibidos a seguir:
 
-\begin{longtable}[]{@{}lr@{}}
-\toprule\noalign{}
-Modelo & Media\_Zeros \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-REAL & 417.0 \\
-Poisson & 259.8 \\
-NegBin & 423.5 \\
-ZIP & 438.1 \\
-\end{longtable}
+\begin{center}
+\begin{tabular}{lr}
+  \hline
+Modelo & MediaZeros \\ 
+  \hline
+REAL & 417.00 \\ 
+  Poisson & 261.04 \\ 
+  NegBin & 423.87 \\ 
+  ZIP & 438.01 \\ 
+   \hline
+\end{tabular}
+\end{center}
 
 Analisando a tabela, é possível concluir que, de fato, o modelo Poisson
 não estava ajustando de forma adequada o excesso de zeros dos dados da
@@ -1289,7 +1295,7 @@ própria inclusão de um coeficiente de sobredispersão já foi suficiente
 para o modelo Binomial Negativo obter uma boa capacidade de representar
 os zeros observados.
 
-\section{4. Discussão e Conclusão}\label{discussuxe3o-e-conclusuxe3o}
+\section{Discussão e Conclusão}\label{discussuxe3o-e-conclusuxe3o}
 
 Portanto, com base nos experimentos e análises conduzidos, pode-se
 concluir que a presença de sobredispersão na variável resposta a ser
@@ -1301,18 +1307,19 @@ de valores zero excessivos.
 
 Ao refinar essa estratégia por meio da adoção de um modelo Poisson
 inflado de zeros (ZIP), o desempenho relacionado ao excesso de zeros
-obteve uma melhora significativa, sendo capaz de absorver e modelar os
-zeros estruturais presentes na base. Entretanto, ele ainda apresentou
-desempenho insatisfatório na modelagem de valores extremos, resultantes
-da alta variância dos dados.
+obteve uma melhora significativa, com o modelo sendo capaz de absorver e
+modelar os zeros estruturais presentes na base. Entretanto, ele ainda
+apresentou desempenho insatisfatório na modelagem de valores extremos,
+resultantes da alta variância dos dados.
 
 Por fim, a inclusão de um coeficiente de sobredispersão por meio da
 utilização de um modelo Binomial Negativo permitiu que as consequências
 geradas pela alta variância fossem mitigadas, como mostrado pelos
-resíduos relativamente menores quando comparados aos resíduos dos
+resíduos relativamente pequenos quando comparados aos resíduos dos
 modelos Poisson e ZIP. Ao mesmo tempo, essa nova característica também
 forneceu ao modelo a capacidade de modelar os zeros estruturais,
-proporcionando um desempenho geral superior aos demais modelos.
+proporcionando um desempenho geral superior aos demais modelos, sendo,
+portanto, preferível dentre os modelos analisados.
 
 No entanto, apesar dos desempenhos variados, todos os modelos estudados
 apresentaram resultados medianos, não sendo capazes de alcançar um
@@ -1335,8 +1342,8 @@ robustos que os obtidos pelos estudados nesse projeto.
 \section{Referências}\label{referuxeancias}
 
 {[}Cameron \& Trivedi (1990){]} Cameron, A. C., \& Trivedi, P. K.
-(1990). Regression-based tests for overdis- \(\hspace{1.5em}\) persion
-in the Poisson model. \emph{Journal of Econometrics, 46}(3), 347--364.
+(1990). Regression-based tests for overdispersion in the Poisson model.
+\emph{Journal of Econometrics, 46}(3), 347--364.
 \url{https://doi.org/10.1016/0304-4076(90)90014-K}
 
 {[}Dobson (2018){]} Dobson, A. J., \& Barnett, A. G. (2018). \emph{An
